@@ -293,7 +293,7 @@ class SpaceSimUI(QWidget):
     def create_asteroid_table(self):
         self.asteroid_table.setColumnCount(10)
         self.asteroid_table.setHorizontalHeaderLabels(
-            ["X", "Y", "Z", "Velocity", "Raw Mass", "Purity", "dX", "dY","dZ", ""]
+            ["X", "Y", "Z", "Velocity", "Raw Mass", "Purity", "dX", "dY","dZ", "ID"]
         )
         self.asteroid_table.horizontalHeader().setStretchLastSection(True)
 
@@ -331,13 +331,27 @@ class SpaceSimUI(QWidget):
             self.start_pause_button.setText("Resume")
 
     def update_time_label(self, time_value):
-        self.time_label.setText(f"Time: {time_value:.2f}s")
+        formatted_time = self.format_time(time_value)
+        self.time_label.setText(f"Time: {formatted_time}")
 
     def update_fuel_label(self, fuel):
         self.fuel_label.setText(f"Fuel: {fuel}%")
 
     def append_to_output_log(self, message):
-        self.output_log.append(message)
+        current_time = self.format_time(self.backend.total_seconds)
+        log_message = f"[{current_time}] {message}"
+        self.output_log.append(log_message)
+
+
+    def format_time(self, seconds):
+        days, remainder = divmod(seconds, 86400)
+        hours, remainder = divmod(remainder, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        return f"{int(days):02d}:{int(hours):02d}:{int(minutes):02d}:{int(seconds):02d}"
+
+
+
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
