@@ -19,41 +19,17 @@ from PyQt6.QtWidgets import (
     QTableWidget,
     QTableWidgetItem,
     QTabWidget,
+    QMessageBox
 )
-from PyQt6.QtCore import Qt, QThread, pyqtSignal, QObject
+from PyQt6.QtCore import Qt, QThread, pyqtSignal, QObject, QTimer
 from PyQt6.QtGui import QKeySequence, QShortcut
 
 class GameState(Enum):
+    GAMESTART = 1
     PLAYING = 2
     PAUSED = 3
 
-class GameLoop(QThread):
-    updateSignal = pyqtSignal(float)
-
-    def __init__(self, backend):
-        super().__init__()
-        self.backend = backend
-        self.target_fps = 60
-        self.running = True
-
-    def run(self):
-        clock = time.perf_counter()
-        dt = 1 / self.target_fps
-        while self.running:
-            new_time = time.perf_counter()
-            frame_time = new_time - clock
-            clock = new_time
-
-            if self.backend.current_game_state == GameState.PLAYING:
-                self.updateSignal.emit(dt)
-
-            sleep_time = dt - (time.perf_counter() - clock)
-            if sleep_time > 0:
-                time.sleep(sleep_time)
-
-    def stop(self):
-        self.running = False
-        self.wait()
+# Removed GameLoop Class, we'll use QTimer instead
 
 class Asteroid:
     existing_ids = set()
@@ -121,14 +97,17 @@ class SpaceSimBackend(QObject):
         self.fuel = 100
         self.total_seconds = 0.0
         self.time_scale = 1.0
-        self.current_game_state = GameState.PLAYING
+        self.current_game_state = GameState.GAMESTART  # Start in GAMESTART
         self.asteroids = [Asteroid.generate_random_asteroid() for _ in range(5)]
-        self.game_loop = GameLoop(self)
-        self.game_loop.updateSignal.connect(self.update)
-        self.game_loop.start()
+        self.target_fps = 60
+        self.game_timer = QTimer(self)
+        self.game_timer.setInterval(int(1000 / self.target_fps))  # milliseconds - Fix: Convert to integer
+        self.game_timer.timeout.connect(self.update)
+        self.game_timer.start()
 
-    def update(self, dt):
+    def update(self):
         if self.current_game_state == GameState.PLAYING:
+            dt = 1 / self.target_fps
             self.total_seconds += dt * self.time_scale
             self.time_updated.emit(self.total_seconds)
 
@@ -163,10 +142,13 @@ class SpaceSimUI(QWidget):
         super().__init__()
         self.backend = backend
         self.setWindowTitle("Space Simulation Game, v.001")
+
+        # Show welcome message before initializing the UI
+        self.show_welcome_message()
+
         self.init_ui()
         self.connect_signals()
 
-        # Make the window movable in "fullscreen"
         self.setWindowFlags(
             Qt.WindowType(
                 Qt.WindowType.Window
@@ -177,31 +159,40 @@ class SpaceSimUI(QWidget):
         )
         self.showMaximized()
 
+    def show_welcome_message(self):
+        msg_box = QMessageBox(self)
+        msg_box.setWindowTitle("Welcome!")
+        msg_box.setText("Hello! Welcome to the Space Simulation Game!")
+        msg_box.exec()
+
+        # Transition to the PLAYING state
+        self.backend.current_game_state = GameState.PLAYING
+        self.backend.game_state_changed.emit(self.backend.current_game_state)
+        
+
     def init_ui(self):
- 
+
         # --- Escape Key Shortcut to Exit Fullscreen ---
         self.exit_shortcut = QShortcut(QKeySequence('Escape'), self)
         self.exit_shortcut.activated.connect(self.close)
 
-
         # --- Main Layout ---
         main_layout = QVBoxLayout()
         self.setLayout(main_layout)
-       
+
         # --- Splitter to Divide Main Window into Top (Game) and Bottom (Log) ---
         main_splitter = QSplitter(Qt.Orientation.Vertical)
-        main_splitter.setSizes([600, 200]) 
+        main_splitter.setSizes([600, 200])
         main_layout.addWidget(main_splitter)
-        
+
         # --- Splitter to Divide Game Area into Left (Controls) and Right (Game View) ---
         game_area_splitter = QSplitter(Qt.Orientation.Horizontal)
-        main_splitter.addWidget(game_area_splitter) 
+        main_splitter.addWidget(game_area_splitter)
 
         self.init_control_panel(game_area_splitter)
         self.init_game_panel(game_area_splitter)
         self.init_log_panel(main_splitter)
 
- 
 
     def init_control_panel(self, splitter):
         # --- Left Panel (Controls) ---
@@ -211,9 +202,9 @@ class SpaceSimUI(QWidget):
 
         # Define the layout FIRST
         controls_layout = QVBoxLayout()
-        controls_layout.setAlignment(Qt.AlignmentFlag.AlignTop) # Align all to the top
+        controls_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
-        self.controls_panel.setLayout(controls_layout) 
+        self.controls_panel.setLayout(controls_layout)
         splitter.addWidget(self.controls_panel)
 
         # --- Start/Pause Button ---
@@ -227,8 +218,8 @@ class SpaceSimUI(QWidget):
 
         # --- Time Scale Control ---
         self.time_scale_spinbox = QDoubleSpinBox(self)
-        self.time_scale_spinbox.setRange(0.1, 10.0)
-        self.time_scale_spinbox.setSingleStep(0.1)
+        self.time_scale_spinbox.setRange(0, 1000)
+        self.time_scale_spinbox.setSingleStep(1)
         self.time_scale_spinbox.setValue(1.0)
         controls_layout.addWidget(self.time_scale_spinbox)
 
@@ -240,43 +231,37 @@ class SpaceSimUI(QWidget):
         self.launch_button = QPushButton("Launch")
         controls_layout.addWidget(self.launch_button)
 
-
-
     def init_log_panel(self, splitter):
         # --- Bottom Panel (Output/Log) ---
-        log_frame = QFrame()  # Create the frame
-        log_frame.setFrameShape(QFrame.Shape.Panel) # Add the panel border
+        log_frame = QFrame()
+        log_frame.setFrameShape(QFrame.Shape.Panel)
 
         # Define the layout FIRST
-        log_layout = QVBoxLayout()  # Define its layout
-        log_frame.setLayout(log_layout)  # Link them
+        log_layout = QVBoxLayout()
+        log_frame.setLayout(log_layout)
 
         # Populate the layout
         self.output_log = QTextEdit()
         self.output_log.setReadOnly(True)
-        log_layout.addWidget(self.output_log) 
+        log_layout.addWidget(self.output_log)
 
-        splitter.addWidget(log_frame)  # Add the FRAME to the splitter
-
+        splitter.addWidget(log_frame)
 
     def init_game_panel(self, splitter):
         # --- Right Panel (Game View) ---
-        game_view_frame = QFrame()  # Create the QFrame
-        game_view_frame.setFrameShape(QFrame.Shape.Panel)  # Add the panel border
-        splitter.addWidget(game_view_frame)  # Add the FRAME to the splitter
+        game_view_frame = QFrame()
+        game_view_frame.setFrameShape(QFrame.Shape.Panel)
+        splitter.addWidget(game_view_frame)
 
         game_view_layout = QVBoxLayout()
-        game_view_frame.setLayout(game_view_layout)  # Set layout on the frame
+        game_view_frame.setLayout(game_view_layout)
 
         # --- Tab Widget for Detailed Information ---
         self.tab_widget = QTabWidget()
         game_view_layout.addWidget(self.tab_widget)
 
         self.init_asteroid_tab()
-        # Add more tabs as needed... 
 
-    
-    
     def init_asteroid_tab(self):
         # --- Asteroid Tab ---
         self.asteroid_tab = QWidget()
@@ -288,7 +273,6 @@ class SpaceSimUI(QWidget):
         self.asteroid_table = QTableWidget()
         asteroid_tab_layout.addWidget(self.asteroid_table)
         self.create_asteroid_table()
-
 
     def create_asteroid_table(self):
         self.asteroid_table.setColumnCount(10)
@@ -310,14 +294,13 @@ class SpaceSimUI(QWidget):
             self.asteroid_table.setItem(row, 6, QTableWidgetItem(f"{asteroid.velocity[0]:.2f}"))
             self.asteroid_table.setItem(row, 7, QTableWidgetItem(f"{asteroid.velocity[1]:.2f}"))
             self.asteroid_table.setItem(row, 8, QTableWidgetItem(f"{asteroid.velocity[2]:.2f}"))
-            self.asteroid_table.setItem(row, 9, QTableWidgetItem(str(asteroid.id))) 
+            self.asteroid_table.setItem(row, 9, QTableWidgetItem(str(asteroid.id)))
 
     def connect_signals(self):
         self.start_pause_button.clicked.connect(self.start_pause_toggled.emit)
         self.time_scale_spinbox.valueChanged.connect(self.time_scale_changed.emit)
         self.launch_button.clicked.connect(self.launch_requested.emit)
 
-        # Connect backend signals to frontend slots
         self.backend.game_state_changed.connect(self.update_game_state)
         self.backend.time_updated.connect(self.update_time_label)
         self.backend.asteroid_data_updated.connect(self.update_asteroid_table)
@@ -342,23 +325,17 @@ class SpaceSimUI(QWidget):
         log_message = f"[{current_time}] {message}"
         self.output_log.append(log_message)
 
-
     def format_time(self, seconds):
         days, remainder = divmod(seconds, 86400)
         hours, remainder = divmod(remainder, 3600)
         minutes, seconds = divmod(remainder, 60)
         return f"{int(days):02d}:{int(hours):02d}:{int(minutes):02d}:{int(seconds):02d}"
 
-
-
-
-
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     backend = SpaceSimBackend()
     window = SpaceSimUI(backend)
 
-    # Connect frontend signals to backend slots
     window.start_pause_toggled.connect(backend.start_pause_game)
     window.time_scale_changed.connect(backend.set_time_scale)
     window.launch_requested.connect(backend.launch_ship)
