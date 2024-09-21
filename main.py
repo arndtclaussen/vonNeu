@@ -29,8 +29,6 @@ class GameState(Enum):
     PLAYING = 2
     PAUSED = 3
 
-# Removed GameLoop Class, we'll use QTimer instead
-
 class Asteroid:
     existing_ids = set()
 
@@ -85,29 +83,23 @@ class Asteroid:
 
         return cls(position, velocity, mass, purity)
 
-class SpaceSimBackend(QObject):
+# --- Model ---
+class SpaceSimModel(QObject):
     game_state_changed = pyqtSignal(GameState)
     time_updated = pyqtSignal(float)
     asteroid_data_updated = pyqtSignal(list)
     fuel_updated = pyqtSignal(int)
-    launch_message = pyqtSignal(str)
 
     def __init__(self):
         super().__init__()
         self.fuel = 100
         self.total_seconds = 0.0
         self.time_scale = 1.0
-        self.current_game_state = GameState.GAMESTART  # Start in GAMESTART
+        self.current_game_state = GameState.GAMESTART
         self.asteroids = [Asteroid.generate_random_asteroid() for _ in range(5)]
-        self.target_fps = 60
-        self.game_timer = QTimer(self)
-        self.game_timer.setInterval(int(1000 / self.target_fps))  # milliseconds - Fix: Convert to integer
-        self.game_timer.timeout.connect(self.update)
-        self.game_timer.start()
 
-    def update(self):
+    def update(self, dt: float):
         if self.current_game_state == GameState.PLAYING:
-            dt = 1 / self.target_fps
             self.total_seconds += dt * self.time_scale
             self.time_updated.emit(self.total_seconds)
 
@@ -115,32 +107,54 @@ class SpaceSimBackend(QObject):
                 asteroid.update(dt * self.time_scale)
             self.asteroid_data_updated.emit(self.asteroids)
 
-    def start_pause_game(self):
-        if self.current_game_state == GameState.PLAYING:
-            self.current_game_state = GameState.PAUSED
-        elif self.current_game_state == GameState.PAUSED:
-            self.current_game_state = GameState.PLAYING
+    def set_game_state(self, state: GameState):
+        self.current_game_state = state
         self.game_state_changed.emit(self.current_game_state)
 
-    def set_time_scale(self, scale):
+    def set_time_scale(self, scale: float):
         self.time_scale = scale
 
     def launch_ship(self):
         if self.fuel > 0:
             self.fuel -= 10
-            self.launch_message.emit("Launching ship! Fuel remaining: {}%".format(self.fuel))
+            self.fuel_updated.emit(self.fuel)
+            return "Launching ship! Fuel remaining: {}%".format(self.fuel)
         else:
-            self.launch_message.emit("Not enough fuel to launch!")
-        self.fuel_updated.emit(self.fuel)
+            return "Not enough fuel to launch!"
 
-class SpaceSimUI(QWidget):
-    start_pause_toggled = pyqtSignal()
-    time_scale_changed = pyqtSignal(float)
-    launch_requested = pyqtSignal()
-
-    def __init__(self, backend):
+# --- Controller ---
+class SpaceSimController(QObject):
+    def __init__(self, model: SpaceSimModel):
         super().__init__()
-        self.backend = backend
+        self.model = model
+        self.target_fps = 60
+        self.game_timer = QTimer(self)
+        self.game_timer.setInterval(int(1000 / self.target_fps))
+        self.game_timer.timeout.connect(self.update_game)
+        self.game_timer.start()
+
+    def update_game(self):
+        dt = 1 / self.target_fps
+        self.model.update(dt)
+
+    def start_pause_game(self):
+        if self.model.current_game_state == GameState.PLAYING:
+            self.model.set_game_state(GameState.PAUSED)
+        elif self.model.current_game_state == GameState.PAUSED:
+            self.model.set_game_state(GameState.PLAYING)
+
+    def set_time_scale(self, scale: float):
+        self.model.set_time_scale(scale)
+
+    def launch_ship(self):
+       message = self.model.launch_ship()
+       return message
+
+# --- View ---
+class SpaceSimUI(QWidget):
+    def __init__(self, controller: SpaceSimController):
+        super().__init__()
+        self.controller = controller
         self.setWindowTitle("Space Simulation Game, v.001")
 
         # Show welcome message before initializing the UI
@@ -166,12 +180,9 @@ class SpaceSimUI(QWidget):
         msg_box.exec()
 
         # Transition to the PLAYING state
-        self.backend.current_game_state = GameState.PLAYING
-        self.backend.game_state_changed.emit(self.backend.current_game_state)
-        
+        self.controller.model.set_game_state(GameState.PLAYING)
 
     def init_ui(self):
-
         # --- Escape Key Shortcut to Exit Fullscreen ---
         self.exit_shortcut = QShortcut(QKeySequence('Escape'), self)
         self.exit_shortcut.activated.connect(self.close)
@@ -192,7 +203,6 @@ class SpaceSimUI(QWidget):
         self.init_control_panel(game_area_splitter)
         self.init_game_panel(game_area_splitter)
         self.init_log_panel(main_splitter)
-
 
     def init_control_panel(self, splitter):
         # --- Left Panel (Controls) ---
@@ -297,15 +307,14 @@ class SpaceSimUI(QWidget):
             self.asteroid_table.setItem(row, 9, QTableWidgetItem(str(asteroid.id)))
 
     def connect_signals(self):
-        self.start_pause_button.clicked.connect(self.start_pause_toggled.emit)
-        self.time_scale_spinbox.valueChanged.connect(self.time_scale_changed.emit)
-        self.launch_button.clicked.connect(self.launch_requested.emit)
+        self.start_pause_button.clicked.connect(self.controller.start_pause_game)
+        self.time_scale_spinbox.valueChanged.connect(self.controller.set_time_scale)
+        self.launch_button.clicked.connect(self.handle_launch_request)
 
-        self.backend.game_state_changed.connect(self.update_game_state)
-        self.backend.time_updated.connect(self.update_time_label)
-        self.backend.asteroid_data_updated.connect(self.update_asteroid_table)
-        self.backend.fuel_updated.connect(self.update_fuel_label)
-        self.backend.launch_message.connect(self.append_to_output_log)
+        self.controller.model.game_state_changed.connect(self.update_game_state)
+        self.controller.model.time_updated.connect(self.update_time_label)
+        self.controller.model.asteroid_data_updated.connect(self.update_asteroid_table)
+        self.controller.model.fuel_updated.connect(self.update_fuel_label)
 
     def update_game_state(self, state):
         if state == GameState.PLAYING:
@@ -321,9 +330,13 @@ class SpaceSimUI(QWidget):
         self.fuel_label.setText(f"Fuel: {fuel}%")
 
     def append_to_output_log(self, message):
-        current_time = self.format_time(self.backend.total_seconds)
+        current_time = self.format_time(self.controller.model.total_seconds)
         log_message = f"[{current_time}] {message}"
         self.output_log.append(log_message)
+    
+    def handle_launch_request(self):
+        message = self.controller.launch_ship()
+        self.append_to_output_log(message)
 
     def format_time(self, seconds):
         days, remainder = divmod(seconds, 86400)
@@ -333,11 +346,7 @@ class SpaceSimUI(QWidget):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    backend = SpaceSimBackend()
-    window = SpaceSimUI(backend)
-
-    window.start_pause_toggled.connect(backend.start_pause_game)
-    window.time_scale_changed.connect(backend.set_time_scale)
-    window.launch_requested.connect(backend.launch_ship)
-
+    model = SpaceSimModel()
+    controller = SpaceSimController(model)
+    window = SpaceSimUI(controller)
     sys.exit(app.exec())
