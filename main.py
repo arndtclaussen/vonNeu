@@ -242,20 +242,31 @@ class SpaceSimUI(QWidget):
 
 
 
+    def init_log_panel(self, splitter):
+        # --- Bottom Panel (Output/Log) ---
+        log_frame = QFrame()  # Create the frame
+        log_frame.setFrameShape(QFrame.Shape.Panel) # Add the panel border
+
+        # Define the layout FIRST
+        log_layout = QVBoxLayout()  # Define its layout
+        log_frame.setLayout(log_layout)  # Link them
+
+        # Populate the layout
+        self.output_log = QTextEdit()
+        self.output_log.setReadOnly(True)
+        log_layout.addWidget(self.output_log) 
+
+        splitter.addWidget(log_frame)  # Add the FRAME to the splitter
 
 
     def init_game_panel(self, splitter):
         # --- Right Panel (Game View) ---
-        game_view_panel = QWidget()
-        splitter.addWidget(game_view_panel)
-        
-        game_view_layout = QVBoxLayout()
-        game_view_panel.setLayout(game_view_layout)
+        game_view_frame = QFrame()  # Create the QFrame
+        game_view_frame.setFrameShape(QFrame.Shape.Panel)  # Add the panel border
+        splitter.addWidget(game_view_frame)  # Add the FRAME to the splitter
 
-        # --- Placeholder for Game View Area ---
-        self.game_view = QLabel("Game View Area") 
-        self.game_view.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        game_view_layout.addWidget(self.game_view)
+        game_view_layout = QVBoxLayout()
+        game_view_frame.setLayout(game_view_layout)  # Set layout on the frame
 
         # --- Tab Widget for Detailed Information ---
         self.tab_widget = QTabWidget()
@@ -264,12 +275,7 @@ class SpaceSimUI(QWidget):
         self.init_asteroid_tab()
         # Add more tabs as needed... 
 
-   
-    def init_log_panel(self, splitter):
-        # --- Bottom Panel (Output/Log) ---
-        self.output_log = QTextEdit()
-        self.output_log.setReadOnly(True)
-        splitter.addWidget(self.output_log)
+    
     
     def init_asteroid_tab(self):
         # --- Asteroid Tab ---
