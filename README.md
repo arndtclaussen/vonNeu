@@ -21,3 +21,8 @@ Maybe we need to update pip other wise we can install the requirements.
 python -m pip install --upgrade pip
 pip3 install -r requirements.txt
 ```
+
+# Short Cut Learning for VS Code
+* Listing all Short Cuts: Strg + K and Strg + S
+* Fold all: Strg + K amd Strg + 0
+* Unfold All: Strg + K and Strg + J
