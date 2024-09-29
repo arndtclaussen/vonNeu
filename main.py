@@ -122,6 +122,11 @@ class SpaceSimModel(QObject):
         else:
             return "Not enough fuel to launch!"
 
+    def add_asteroid(self):
+        self.asteroids.append(Asteroid.generate_random_asteroid())
+        self.asteroid_data_updated.emit(self.asteroids)
+
+        
 # --- Controller ---
 class SpaceSimController(QObject):
     def __init__(self, model: SpaceSimModel):
@@ -149,6 +154,9 @@ class SpaceSimController(QObject):
     def launch_ship(self):
        message = self.model.launch_ship()
        return message
+
+    def scan_for_asteroid(self):
+        self.model.add_asteroid()
 
 # --- View ---
 class SpaceSimUI(QWidget):
@@ -231,6 +239,9 @@ class SpaceSimUI(QWidget):
         self.time_scale_spinbox.setRange(0, 1000)
         self.time_scale_spinbox.setSingleStep(1)
         self.time_scale_spinbox.setValue(1.0)
+        time_scale_label = QLabel("Time Scale (x):")
+        
+        controls_layout.addWidget(time_scale_label)
         controls_layout.addWidget(self.time_scale_spinbox)
 
         # --- Fuel Label ---
@@ -240,6 +251,10 @@ class SpaceSimUI(QWidget):
         # --- Launch Button ---
         self.launch_button = QPushButton("Launch")
         controls_layout.addWidget(self.launch_button)
+
+         # --- Scan Button ---
+        self.scan_button = QPushButton("Scan", self)
+        controls_layout.addWidget(self.scan_button)
 
     def init_log_panel(self, splitter):
         # --- Bottom Panel (Output/Log) ---
@@ -315,6 +330,8 @@ class SpaceSimUI(QWidget):
         self.controller.model.time_updated.connect(self.update_time_label)
         self.controller.model.asteroid_data_updated.connect(self.update_asteroid_table)
         self.controller.model.fuel_updated.connect(self.update_fuel_label)
+
+        self.scan_button.clicked.connect(self.controller.scan_for_asteroid)
 
     def update_game_state(self, state):
         if state == GameState.PLAYING:
