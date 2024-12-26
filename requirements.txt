@@ -1,1 +1,4 @@
-PyQt6
+Flask
+psycopg2-binary
+
+tailwindcss
