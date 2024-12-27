@@ -3,36 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %} {% endblock %} - FlaskApp</title>
-    <style>
-        nav a {
-            color: #d64161;
-            font-size: 3em;
-            margin-left: 50px;
-            text-decoration: none;
-        }
-
-        .book {
-            padding: 20px;
-            margin: 10px;
-            background-color: #f7f4f4;
-        }
-
-        .review {
-                margin-left: 50px;
-                font-size: 20px;
-        }
-
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"> </head> <style> /* Custom Styles */
+        body { display: flex; } /* Flexbox layout for main structure */
+        .activity-bar { width: 100px; background-color: #333; }
+        .activity-bar a { display: block; padding: 10px; color: #fff; text-align: center; } /* Style for activity links */
+        .activity-bar a.active { background-color: #444; } /* Highlight active activity */
+        .side-bar { width: 200px; background-color: #eee; overflow-y: auto; }
+        .editor-area { flex: 1; padding: 20px; background: #fff; /* Main content background color */ }
+        .book { padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; }
     </style>
-</head>
 <body>
-    <nav>
-        <a href="{{ url_for('index') }}">FlaskApp</a>
-        <a href="{{ url_for('create') }}">Create</a>
-        <a href="#">About</a>
-    </nav>
-    <hr>
-    <div class="content">
-        {% block content %} {% endblock %}
+    <div class="activity-bar"> {/* Activity Bar */}
+        <a href="#" onclick="showSection('library')" class="active">LIB</a>
+        </div>
+
+    <div class="side-bar" id="side-bar-content">
+            <ul>
+                {% for book in books %}
+                    <li>
+                        <a href="#" class="block py-2 text-gray-800 hover:bg-gray-300"
+                           onclick="showBookDetails({{ book[0] }});">{{ book[1] }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
     </div>
+
+
+    <div class="editor-area" id="main-content"> {/* Main Content */}
+    <div id="book-details"></div> </div>
+
+
+
+    <script>
+      const books = {{ books | tojson }}; // Pass books data to JavaScript
+
+      function showBookDetails(bookId) {
+          const book = books.find(b => b[0] === bookId);
+          if (book) {
+              const detailsHtml = `
+                  <div class="book p-4 m-2 bg-gray-100 rounded-lg">
+                      <h3 class="text-xl font-semibold">#${book[0]} - ${book[1]} BY ${book[2]}</h3>
+                      <i class="text-gray-600"><p>(${book[3]} pages)</p></i>
+                      <p class="review ml-10 text-lg">${book[4]}</p>
+                      <i class="text-gray-600"><p>Added ${book[5]}</p></i>
+                  </div>
+              `;
+              document.getElementById('book-details').innerHTML = detailsHtml;
+          }
+      }
+
+
+</script>
+
+
 </body>
 </html>

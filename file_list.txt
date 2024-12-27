@@ -1,4 +1,5 @@
 1) Folder Structure:
+./tailwind.config.js
 ./README.md
 ./app.py
 ./init_db.py
@@ -9,6 +10,16 @@
 ./templates/index.html
 
 2) File Content by File:
+./tailwind.config.js:
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: ["./templates/**/*.html"], // This line is KEY!
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+
 ./README.md:
 # vonNeu
 Lets have some internal fun. Why not.
@@ -52,6 +63,11 @@ We are following this [here](https://www.digitalocean.com/community/tutorials/ho
 
 export FLASK_APP=app
 export FLASK_ENV=development
+
+
+### Bringin in Tailwind
+npx tailwindcss init
+
 
 ./app.py:
 import os
@@ -264,7 +280,10 @@ if __name__ == "__main__":
 <head>
     <meta charset="UTF-8">
     <title>{% block title %} {% endblock %} - FlaskApp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
+      @layer base {
+        @tailwind base;
         nav a {
             color: #d64161;
             font-size: 3em;
@@ -282,7 +301,15 @@ if __name__ == "__main__":
                 margin-left: 50px;
                 font-size: 20px;
         }
+      }
 
+      @layer components {
+        @tailwind components;
+      }
+
+      @layer utilities {
+        @tailwind utilities;
+      }
     </style>
 </head>
 <body>
@@ -298,17 +325,18 @@ if __name__ == "__main__":
 </body>
 </html>
 
+
 ./templates/index.html:
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>{% block title %} Books {% endblock %}</h1>
+    <h1 class="text-3xl font-bold underline">Books</h1> <--- Example of Tailwind classes
     {% for book in books %}
-        <div class='book'>
-            <h3>#{{ book[0] }} - {{ book[1] }} BY {{ book[2] }}</h3>
-            <i><p>({{ book[3] }} pages)</p></i>
-            <p class='review'>{{ book[4] }}</p>
-            <i><p>Added {{ book[5] }}</p></i>
+        <div class="book p-4 m-2 bg-gray-100 rounded-lg"> <--- More Tailwind classes
+            <h3 class="text-xl font-semibold">#{{ book[0] }} - {{ book[1] }} BY {{ book[2] }}</h3>
+            <i class="text-gray-600"><p>({{ book[3] }} pages)</p></i>
+            <p class="review ml-10 text-lg">{{ book[4] }}</p>
+            <i class="text-gray-600"><p>Added {{ book[5] }}</p></i>
         </div>
     {% endfor %}
 {% endblock %}
