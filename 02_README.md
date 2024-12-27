@@ -29,6 +29,11 @@ docker run --name game-vonneu -e POSTGRES_PASSWORD=mysecretpassword -e POSTGRES_
 export FLASK_APP=app
 export FLASK_ENV=development
 
+export POSTGRES_HOST="localhost"
+export POSTGRES_DB="vonneu_db"
+export POSTGRES_USER="myuser"
+export POSTGRES_PASSWORD="mysecretpassword"
+
 
 ## Bringin in Tailwind
 npx tailwindcss init

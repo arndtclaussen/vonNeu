@@ -19,7 +19,7 @@
 
     <div class="side-bar" id="side-bar-content">
             <ul>
-                {% for probe in Probes %}
+                {% for probe in probes %}
                     <li>
                         <a href="#" class="block py-2 text-gray-800 hover:bg-gray-300"
                         onclick="showProbeDetails({{ probe[0] }});">{{ probe[1] }}</a>
@@ -35,10 +35,10 @@
 
 
     <script>
-      const Probes = {{ Probes | tojson }}; // Pass probes data to JavaScript
+      const probes = {{ probes | tojson }}; // Pass probes data to JavaScript
 
       function showProbeDetails(probeId) {
-         const probe = Probes.find(p => p[0] === probeId);
+         const probe = probes.find(p => p[0] === probeId);
         if (probe) {
             const detailsHtml = `
                 <div class="probe p-4 m-2 bg-gray-100 rounded-lg">

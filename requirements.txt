@@ -1,2 +1,5 @@
 Flask
 psycopg2-binary
+
+# Loading .env 
+python-dotenv
