@@ -46,13 +46,15 @@ def list_files_recursive(directory, output_file, ignore_list):
 
 if __name__ == "__main__":
     directory_to_scan = "."
-    output_filename = "file_list.txt"
+    output_filename = "ZZ_Generated_prompt.txt"
     ignore_paths = [
         os.path.join(".", "env"),
-        os.path.join(".", "file_list.txt"),  # Important to ignore output file!
+        os.path.join(".", "ZZ_Generated_prompt.txt"),  # Important to ignore output file!
         os.path.join(".", ".git"),
         os.path.join(".", "__pycache__"),
-        os.path.join(".", ".gitignore")
+        os.path.join(".", ".gitignore"),
+        os.path.join(".", "ZZ_Generate_prompt.py"),
+        
     ]
 
     list_files_recursive(directory_to_scan, output_filename, ignore_paths)

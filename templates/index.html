@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1 class="text-3xl font-bold underline">Books</h1> <--- Example of Tailwind classes
-    {% for book in books %}
-        <div class="book p-4 m-2 bg-gray-100 rounded-lg"> <--- More Tailwind classes
-            <h3 class="text-xl font-semibold">#{{ book[0] }} - {{ book[1] }} BY {{ book[2] }}</h3>
-            <i class="text-gray-600"><p>({{ book[3] }} pages)</p></i>
-            <p class="review ml-10 text-lg">{{ book[4] }}</p>
-            <i class="text-gray-600"><p>Added {{ book[5] }}</p></i>
+    <h1 class="text-3xl font-bold underline">Probes</h1>
+    {% for probe in Probes %}
+        <div class="probe p-4 m-2 bg-gray-100 rounded-lg">
+            <h3 class="text-xl font-semibold">Probe ID: {{ probe[0] }}</h3>
+            <p>Type: {{ probe[1] }}</p>
+            <p>Build Time: {{ probe[2] if probe[2] is not none else "N/A" }}</p> <--- Handle potential None values
+            <p>Status: {{ probe[3] }}</p>
         </div>
     {% endfor %}
 {% endblock %}

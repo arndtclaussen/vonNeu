@@ -1,0 +1,271 @@
+1) Folder Structure:
+./02_README.md
+./tailwind.config.js
+./01_UI_Guide.md
+./app.py
+./init_db.py
+./requirements.txt
+./templates/base.html
+./templates/index.html
+
+2) File Content by File:
+./02_README.md:
+# README
+This documents describes how to setup the development and testing environment on a local machine.
+
+
+## Initial Python setup (SOP)
+Create a new environment. 
+```
+python3 -m venv env
+source env/bin/activate
+python -m pip install --upgrade pip
+pip3 install -r requirements.txt
+```
+
+## Short Cut Learning for VS Code
+* Listing all Short Cuts: Strg + K and Strg + S
+* Fold all: Strg + K amd Strg + 0
+* Unfold All: Strg + K and Strg + J
+
+## Using Docker Locally to run the stuff in a postgres or something.
+* Start the docker container with a simple postgres SQL.
+```
+docker run --name game-vonneu -e POSTGRES_PASSWORD=mysecretpassword -e POSTGRES_USER=myuser -e POSTGRES_DB=vonneu_db -d -p 5432:5432 postgres
+```
+* For testing purposes: Connect with something like dbeaver into it.
+
+
+
+## Setup Flask
+export FLASK_APP=app
+export FLASK_ENV=development
+
+
+## Bringin in Tailwind
+npx tailwindcss init
+
+
+## References
+* Library Flask Example, see [here](https://www.digitalocean.com/community/tutorials/how-to-use-a-postgresql-database-in-a-flask-application).
+
+
+
+./tailwind.config.js:
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: ["./templates/**/*.html"], // This line is KEY!
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+
+./01_UI_Guide.md:
+# UI Guide
+Building a web-based strategy game UI inspired by VS Code's layout. Here's a summary of the components and their functions:
+
+
+# General structure
+## Menu Bar
+A horizontal bar at the top with menu items like "Admin" and "Help," providing access to game settings and information.
+
+## Activity Bar
+A vertical bar on the left with icons (or labels) representing different game views/activities. For the moment we only have:
+* Probes
+* Asteroids
+
+Clicking an activity switches the content in the Side Bar and Main Area.
+
+## Side Bar:
+A panel to the right of the Activity Bar. Its content dynamically changes based on the selected activity. For example, clicking "Probes" shows all available probes in a list. While clicking "Asteroids" shows already located asteroids for further mining activties.
+
+## Main Area (Editor Area):
+The largest central area where the core game information and interactions are displayed. 
+
+
+## Panels: 
+Located below the Main Area. Initially, a "Game Logs" panel will display messages about game events.
+
+
+# User Interaction Flow:
+*  The player selects an activity from the Activity Bar.
+* The Side Bar and Main Area update to display content relevant to the chosen activity.
+* The player interacts with the game elements in the Main Area 
+* Game events and updates are logged in the Game Logs panel.
+
+
+
+./app.py:
+import os
+import psycopg2
+from flask import Flask, render_template, request, url_for, redirect
+
+# ...
+
+app = Flask(__name__)
+
+def get_db_connection():
+    conn = psycopg2.connect(host='localhost',
+                            database='vonneu_db',
+                            user="myuser",
+                            password="mysecretpassword")
+    return conn
+
+
+@app.route('/')
+def index():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM Probes;')
+    Probes = cur.fetchall()
+    cur.close()
+    conn.close()
+    return render_template('index.html', Probes=Probes)
+
+
+
+
+./init_db.py:
+import os
+import psycopg2
+
+conn = psycopg2.connect(
+        host="localhost",
+        database="vonneu_db",
+        user="myuser",
+        password="mysecretpassword")
+
+
+cur = conn.cursor()
+
+# Create Probes table
+cur.execute('DROP TABLE IF EXISTS Probes;')
+cur.execute('''CREATE TABLE Probes (
+                id integer PRIMARY KEY,
+                Type varchar(50) NOT NULL,
+                Build_Time timestamp,
+                Status varchar(50)
+                );''')
+
+# Insert data into Probes table
+cur.execute('''INSERT INTO Probes (id, Type, Build_Time, Status)
+            VALUES (%s, %s, %s, %s);''',
+            (12, 'Mk1', '2024-12-27 06:04:00', 'Docked'))
+
+cur.execute('''INSERT INTO Probes (id, Type, Build_Time, Status)
+            VALUES (%s, %s, %s, %s);''',
+            (13, 'Mk1', '2024-12-27 08:04:00', 'Exploring'))
+
+cur.execute('''INSERT INTO Probes (id, Type, Build_Time, Status)
+            VALUES (%s, %s, %s, %s);''',
+            (23, 'Mk2', None, 'In Production')) # Using None for NULL timestamp
+
+
+# Create Asteroids table
+cur.execute('DROP TABLE IF EXISTS Asteroids;')
+cur.execute('''CREATE TABLE Asteroids (
+                id integer PRIMARY KEY,
+                "Size (in kg)" bigint,  -- Use double quotes for column names with spaces
+                "Delta V" integer
+                );''')
+
+
+# Insert data into Asteroids table
+cur.execute('''INSERT INTO Asteroids (id, "Size (in kg)", "Delta V")
+            VALUES (%s, %s, %s);''',
+            (1, 1242, 100))
+
+cur.execute('''INSERT INTO Asteroids (id, "Size (in kg)", "Delta V")
+            VALUES (%s, %s, %s);''',
+            (2, 12423342234, 1002))
+
+
+conn.commit()
+
+cur.close()
+conn.close()
+
+
+./requirements.txt:
+Flask
+psycopg2-binary
+
+
+./templates/base.html:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %} {% endblock %} - FlaskApp</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"> </head> <style> /* Custom Styles */
+        body { display: flex; } /* Flexbox layout for main structure */
+        .activity-bar { width: 100px; background-color: #333; }
+        .activity-bar a { display: block; padding: 10px; color: #fff; text-align: center; } /* Style for activity links */
+        .activity-bar a.active { background-color: #444; } /* Highlight active activity */
+        .side-bar { width: 200px; background-color: #eee; overflow-y: auto; }
+        .editor-area { flex: 1; padding: 20px; background: #fff; /* Main content background color */ }
+        .probe { padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; }
+    </style>
+<body>
+    <div class="activity-bar"> {/* Activity Bar */}
+        <a href="#" onclick="showSection('library')" class="active">LIB</a>
+        </div>
+
+    <div class="side-bar" id="side-bar-content">
+            <ul>
+                {% for probe in Probes %}
+                    <li>
+                        <a href="#" class="block py-2 text-gray-800 hover:bg-gray-300"
+                        onclick="showProbeDetails({{ probe[0] }});">{{ probe[1] }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+    </div>
+
+
+    <div class="editor-area" id="main-content">
+        <div id="probe-details"></div>
+    </div>
+
+
+    <script>
+      const Probes = {{ Probes | tojson }}; // Pass probes data to JavaScript
+
+      function showProbeDetails(probeId) {
+         const probe = Probes.find(p => p[0] === probeId);
+        if (probe) {
+            const detailsHtml = `
+                <div class="probe p-4 m-2 bg-gray-100 rounded-lg">
+                    <h3 class="text-xl font-semibold">Probe ID: ${probe[0]}</h3>
+                    <p>Type: ${probe[1]}</p>
+                    <p>Build Time: ${probe[2] ? probe[2] : "N/A"}</p>
+                    <p>Status: ${probe[3]}</p>
+                </div>
+            `;
+            document.getElementById('probe-details').innerHTML = detailsHtml; // Keep this line
+        }
+}
+
+
+</script>
+
+
+</body>
+</html>
+
+./templates/index.html:
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1 class="text-3xl font-bold underline">Probes</h1>
+    {% for probe in Probes %}
+        <div class="probe p-4 m-2 bg-gray-100 rounded-lg">
+            <h3 class="text-xl font-semibold">Probe ID: {{ probe[0] }}</h3>
+            <p>Type: {{ probe[1] }}</p>
+            <p>Build Time: {{ probe[2] if probe[2] is not none else "N/A" }}</p> <--- Handle potential None values
+            <p>Status: {{ probe[3] }}</p>
+        </div>
+    {% endfor %}
+{% endblock %}
+
