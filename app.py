@@ -32,19 +32,21 @@ def index():
     conn.close()
     return render_template('index.html', probes=probes) # lowercase variable name here too
 
-
-
 @app.route('/probe/<int:probe_id>')
 def probe_details(probe_id):
     conn = get_db_connection()
     cur = conn.cursor()
+
     cur.execute('SELECT * FROM Probes WHERE id = %s;', (probe_id,))
-    probe = cur.fetchone()
+    current_probe = cur.fetchone()
+
+    if not current_probe:  # Handle the case where the probe is not found
+        return "Probe not found", 404  # Or redirect to an error page
+
+
+    cur.execute('SELECT * FROM Probes;') # Fetch all probes for sidebar
+    probes = cur.fetchall()
     cur.close()
     conn.close()
 
-    if probe:
-        return render_template('probe_details.html', probe=probe)
-    return "Probe not found", 404  # Return 404 if probe doesn't exist
-
-
+    return render_template('probe_details.html', current_probe=current_probe, probes=probes)  # Pass both variables

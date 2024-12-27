@@ -5,8 +5,10 @@
 ./app.py
 ./init_db.py
 ./requirements.txt
+./.env
 ./templates/base.html
 ./templates/index.html
+./templates/probe_details.html
 
 2) File Content by File:
 ./02_README.md:
@@ -27,6 +29,9 @@ pip3 install -r requirements.txt
 * Listing all Short Cuts: Strg + K and Strg + S
 * Fold all: Strg + K amd Strg + 0
 * Unfold All: Strg + K and Strg + J
+* Format HTML: 
+    * Format Document command Ctrl+Shift+I to format the entire file 
+    * Format Selection Ctrl+K Ctrl+F to just format the selected text.
 
 ## Using Docker Locally to run the stuff in a postgres or something.
 * Start the docker container with a simple postgres SQL.
@@ -40,6 +45,11 @@ docker run --name game-vonneu -e POSTGRES_PASSWORD=mysecretpassword -e POSTGRES_
 ## Setup Flask
 export FLASK_APP=app
 export FLASK_ENV=development
+
+export POSTGRES_HOST="localhost"
+export POSTGRES_DB="vonneu_db"
+export POSTGRES_USER="myuser"
+export POSTGRES_PASSWORD="mysecretpassword"
 
 
 ## Bringin in Tailwind
@@ -101,16 +111,24 @@ import os
 import psycopg2
 from flask import Flask, render_template, request, url_for, redirect
 
-# ...
+
+### Loading Environment Variables
+from dotenv import load_dotenv
+load_dotenv()  # take environment variables from .env.
+
+
 
 app = Flask(__name__)
 
 def get_db_connection():
-    conn = psycopg2.connect(host='localhost',
-                            database='vonneu_db',
-                            user="myuser",
-                            password="mysecretpassword")
+    conn = psycopg2.connect(
+        host=os.environ.get("POSTGRES_HOST"),
+        database=os.environ.get("POSTGRES_DB"),
+        user=os.environ.get("POSTGRES_USER"),
+        password=os.environ.get("POSTGRES_PASSWORD")
+    )
     return conn
+
 
 
 @app.route('/')
@@ -118,13 +136,29 @@ def index():
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute('SELECT * FROM Probes;')
-    Probes = cur.fetchall()
+    probes = cur.fetchall()  # lowercase variable names for consistency
     cur.close()
     conn.close()
-    return render_template('index.html', Probes=Probes)
+    return render_template('index.html', probes=probes) # lowercase variable name here too
+
+@app.route('/probe/<int:probe_id>')
+def probe_details(probe_id):
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute('SELECT * FROM Probes WHERE id = %s;', (probe_id,))
+    current_probe = cur.fetchone()
+
+    if not current_probe:  # Handle the case where the probe is not found
+        return "Probe not found", 404  # Or redirect to an error page
 
 
+    cur.execute('SELECT * FROM Probes;') # Fetch all probes for sidebar
+    probes = cur.fetchall()
+    cur.close()
+    conn.close()
 
+    return render_template('probe_details.html', current_probe=current_probe, probes=probes)  # Pass both variables
 
 ./init_db.py:
 import os
@@ -191,81 +225,96 @@ conn.close()
 Flask
 psycopg2-binary
 
+# Loading .env 
+python-dotenv
+
+./.env:
+POSTGRES_HOST=localhost
+POSTGRES_DB=vonneu_db
+POSTGRES_USER=myuser
+POSTGRES_PASSWORD=mysecretpassword
+
+FLASK_APP=app
+FLASK_ENV=development
 
 ./templates/base.html:
+<!-- templates/base.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %} {% endblock %} - FlaskApp</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"> </head> <style> /* Custom Styles */
-        body { display: flex; } /* Flexbox layout for main structure */
-        .activity-bar { width: 100px; background-color: #333; }
-        .activity-bar a { display: block; padding: 10px; color: #fff; text-align: center; } /* Style for activity links */
-        .activity-bar a.active { background-color: #444; } /* Highlight active activity */
-        .side-bar { width: 200px; background-color: #eee; overflow-y: auto; }
-        .editor-area { flex: 1; padding: 20px; background: #fff; /* Main content background color */ }
-        .probe { padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; }
-    </style>
-<body>
-    <div class="activity-bar"> {/* Activity Bar */}
-        <a href="#" onclick="showSection('library')" class="active">LIB</a>
-        </div>
-
-    <div class="side-bar" id="side-bar-content">
-            <ul>
-                {% for probe in Probes %}
-                    <li>
-                        <a href="#" class="block py-2 text-gray-800 hover:bg-gray-300"
-                        onclick="showProbeDetails({{ probe[0] }});">{{ probe[1] }}</a>
-                    </li>
-                {% endfor %}
-            </ul>
+    <title>{% block title %}{% endblock %} - FlaskApp</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="flex">  <!-- Add flex to body for layout -->
+    <div class="activity-bar w-24 bg-gray-800">
+        <a href="/" class="block py-2 px-4 text-gray-100 hover:bg-gray-700 {% if request.path == '/' %}bg-gray-900{% endif %}">Probes</a>
+        <a href="/asteroids" class="block py-2 px-4 text-gray-100 hover:bg-gray-700 {% if request.path == '/asteroids' %}bg-gray-900{% endif %}">Asteroids</a>
     </div>
 
-
-    <div class="editor-area" id="main-content">
-        <div id="probe-details"></div>
+    <div class="side-bar w-64 bg-gray-200 overflow-y-auto">
+        {% block sidebar %}{% endblock %}
     </div>
 
+    <main class="editor-area flex-1 p-4 bg-gray-100">
+        {% block content %}{% endblock %}
+    </main>
 
     <script>
-      const Probes = {{ Probes | tojson }}; // Pass probes data to JavaScript
-
-      function showProbeDetails(probeId) {
-         const probe = Probes.find(p => p[0] === probeId);
-        if (probe) {
-            const detailsHtml = `
-                <div class="probe p-4 m-2 bg-gray-100 rounded-lg">
-                    <h3 class="text-xl font-semibold">Probe ID: ${probe[0]}</h3>
-                    <p>Type: ${probe[1]}</p>
-                    <p>Build Time: ${probe[2] ? probe[2] : "N/A"}</p>
-                    <p>Status: ${probe[3]}</p>
-                </div>
-            `;
-            document.getElementById('probe-details').innerHTML = detailsHtml; // Keep this line
-        }
-}
-
-
-</script>
-
-
+        // JavaScript can be added here if needed
+    </script>
 </body>
 </html>
 
 ./templates/index.html:
+<!-- templates/index.html -->
 {% extends 'base.html' %}
 
+{% block title %}Probes{% endblock %}
+
+{% block sidebar %}
+    <ul>
+        {% for probe in probes %}
+        <li>
+            <a href="{{ url_for('probe_details', probe_id=probe[0]) }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300">{{ probe[1] }} (ID: {{ probe[0] }})</a>
+        </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+
+
 {% block content %}
-    <h1 class="text-3xl font-bold underline">Probes</h1>
-    {% for probe in Probes %}
-        <div class="probe p-4 m-2 bg-gray-100 rounded-lg">
-            <h3 class="text-xl font-semibold">Probe ID: {{ probe[0] }}</h3>
-            <p>Type: {{ probe[1] }}</p>
-            <p>Build Time: {{ probe[2] if probe[2] is not none else "N/A" }}</p> <--- Handle potential None values
-            <p>Status: {{ probe[3] }}</p>
-        </div>
-    {% endfor %}
+    <h1 class="text-3xl font-bold mb-4">Probes Overview</h1>
+    <!-- Add content for the main probes overview if needed -->
+{% endblock %}
+
+./templates/probe_details.html:
+<!-- templates/probe_details.html -->
+{% extends 'base.html' %}
+
+{% block title %}Probe Details{% endblock %}
+
+{% block sidebar %}
+    <!-- You can keep the same sidebar as the index.html or customize it -->
+    <ul>
+        {% for probe in probes %}  <!-- Make sure 'probes' is passed to this template -->
+        <li>
+            <a href="{{ url_for('probe_details', probe_id=probe[0]) }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300 {% if probe[0] == current_probe.id %}bg-gray-400{% endif %}">{{ probe[1] }} (ID: {{ probe[0] }})</a>
+        </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+
+
+{% block content %}
+    <h1 class="text-3xl font-bold mb-4">Probe Details</h1>
+
+    <div class="probe p-4 m-2 bg-white rounded-lg shadow">
+        <h3 class="text-xl font-semibold">Probe ID: {{ current_probe[0] }}</h3>
+        <p>Type: {{ current_probe[1] }}</p>
+        <p>Build Time: {{ current_probe[2] if current_probe[2] is not none else "N/A" }}</p>
+        <p>Status: {{ current_probe[3] }}</p>
+    </div>
+
 {% endblock %}
 

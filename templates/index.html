@@ -1,13 +1,20 @@
+<!-- templates/index.html -->
 {% extends 'base.html' %}
 
+{% block title %}Probes{% endblock %}
+
+{% block sidebar %}
+    <ul>
+        {% for probe in probes %}
+        <li>
+            <a href="{{ url_for('probe_details', probe_id=probe[0]) }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300">{{ probe[1] }} (ID: {{ probe[0] }})</a>
+        </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+
+
 {% block content %}
-    <h1 class="text-3xl font-bold underline">Probes</h1>
-    {% for probe in Probes %}
-        <div class="probe p-4 m-2 bg-gray-100 rounded-lg">
-            <h3 class="text-xl font-semibold">Probe ID: {{ probe[0] }}</h3>
-            <p>Type: {{ probe[1] }}</p>
-            <p>Build Time: {{ probe[2] if probe[2] is not none else "N/A" }}</p> <--- Handle potential None values
-            <p>Status: {{ probe[3] }}</p>
-        </div>
-    {% endfor %}
+    <h1 class="text-3xl font-bold mb-4">Probes Overview</h1>
+    <!-- Add content for the main probes overview if needed -->
 {% endblock %}

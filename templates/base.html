@@ -1,60 +1,27 @@
+<!-- templates/base.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %} {% endblock %} - FlaskApp</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"> </head> <style> /* Custom Styles */
-        body { display: flex; } /* Flexbox layout for main structure */
-        .activity-bar { width: 100px; background-color: #333; }
-        .activity-bar a { display: block; padding: 10px; color: #fff; text-align: center; } /* Style for activity links */
-        .activity-bar a.active { background-color: #444; } /* Highlight active activity */
-        .side-bar { width: 200px; background-color: #eee; overflow-y: auto; }
-        .editor-area { flex: 1; padding: 20px; background: #fff; /* Main content background color */ }
-        .probe { padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; }
-    </style>
-<body>
-    <div class="activity-bar"> {/* Activity Bar */}
-        <a href="#" onclick="showSection('library')" class="active">LIB</a>
-        </div>
-
-    <div class="side-bar" id="side-bar-content">
-            <ul>
-                {% for probe in probes %}
-                    <li>
-                        <a href="#" class="block py-2 text-gray-800 hover:bg-gray-300"
-                        onclick="showProbeDetails({{ probe[0] }});">{{ probe[1] }}</a>
-                    </li>
-                {% endfor %}
-            </ul>
+    <title>{% block title %}{% endblock %} - FlaskApp</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="flex">  <!-- Add flex to body for layout -->
+    <div class="activity-bar w-24 bg-gray-800">
+        <a href="/" class="block py-2 px-4 text-gray-100 hover:bg-gray-700 {% if request.path == '/' %}bg-gray-900{% endif %}">Probes</a>
+        <a href="/asteroids" class="block py-2 px-4 text-gray-100 hover:bg-gray-700 {% if request.path == '/asteroids' %}bg-gray-900{% endif %}">Asteroids</a>
     </div>
 
-
-    <div class="editor-area" id="main-content">
-        <div id="probe-details"></div>
+    <div class="side-bar w-64 bg-gray-200 overflow-y-auto">
+        {% block sidebar %}{% endblock %}
     </div>
 
+    <main class="editor-area flex-1 p-4 bg-gray-100">
+        {% block content %}{% endblock %}
+    </main>
 
     <script>
-      const probes = {{ probes | tojson }}; // Pass probes data to JavaScript
-
-      function showProbeDetails(probeId) {
-         const probe = probes.find(p => p[0] === probeId);
-        if (probe) {
-            const detailsHtml = `
-                <div class="probe p-4 m-2 bg-gray-100 rounded-lg">
-                    <h3 class="text-xl font-semibold">Probe ID: ${probe[0]}</h3>
-                    <p>Type: ${probe[1]}</p>
-                    <p>Build Time: ${probe[2] ? probe[2] : "N/A"}</p>
-                    <p>Status: ${probe[3]}</p>
-                </div>
-            `;
-            document.getElementById('probe-details').innerHTML = detailsHtml; // Keep this line
-        }
-}
-
-
-</script>
-
-
+        // JavaScript can be added here if needed
+    </script>
 </body>
 </html>

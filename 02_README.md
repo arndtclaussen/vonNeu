@@ -15,6 +15,9 @@ pip3 install -r requirements.txt
 * Listing all Short Cuts: Strg + K and Strg + S
 * Fold all: Strg + K amd Strg + 0
 * Unfold All: Strg + K and Strg + J
+* Format HTML: 
+    * Format Document command Ctrl+Shift+I to format the entire file 
+    * Format Selection Ctrl+K Ctrl+F to just format the selected text.
 
 ## Using Docker Locally to run the stuff in a postgres or something.
 * Start the docker container with a simple postgres SQL.
