@@ -1,4 +1,4 @@
-<!-- templates/index.html -->
+<!-- templates/probes/list.html -->
 {% extends 'base.html' %}
 
 {% block title %}Probes{% endblock %}
@@ -7,7 +7,7 @@
     <ul>
         {% for probe in probes %}
         <li>
-            <a href="{{ url_for('probe_details', probe_id=probe[0]) }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300">{{ probe[1] }} (ID: {{ probe[0] }})</a>
+            <a href="{{ url_for('probes.details', probe_id=probe.id) }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300">{{ probe.type }} (ID: {{ probe.id }})</a>
         </li>
         {% endfor %}
     </ul>

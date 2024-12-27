@@ -3,12 +3,29 @@
 ./tailwind.config.js
 ./01_UI_Guide.md
 ./app.py
+./config.py
 ./init_db.py
+./03_Target_Structure.md
 ./requirements.txt
 ./.env
+./views/probes.py
+./views/__init__.py
+./views/asteroids.py
+./views/__pycache__/probes.cpython-38.pyc
+./views/__pycache__/__init__.cpython-38.pyc
+./views/__pycache__/asteroids.cpython-38.pyc
+./utils/db.py
+./utils/__pycache__/db.cpython-38.pyc
+./models/__init__.py
+./models/asteroid.py
+./models/probe.py
+./models/__pycache__/asteroid.cpython-38.pyc
+./models/__pycache__/__init__.cpython-38.pyc
+./models/__pycache__/probe.cpython-38.pyc
 ./templates/base.html
-./templates/index.html
-./templates/probe_details.html
+./templates/asteroids/index.html
+./templates/probes/list.html
+./templates/probes/details.html
 
 2) File Content by File:
 ./02_README.md:
@@ -108,57 +125,47 @@ Located below the Main Area. Initially, a "Game Logs" panel will display message
 
 ./app.py:
 import os
-import psycopg2
-from flask import Flask, render_template, request, url_for, redirect
-
-
-### Loading Environment Variables
+from flask import Flask
 from dotenv import load_dotenv
-load_dotenv()  # take environment variables from .env.
+
+from config import Config
+from models import db
+from utils.db import init_db # Function to initialize database
+from views import probes_bp, asteroids_bp
+
+load_dotenv()
+
+def create_app(config_class=Config):
+    app = Flask(__name__)
+    app.config.from_object(config_class)
+
+    db.init_app(app)
+
+    app.register_blueprint(probes_bp)
+    app.register_blueprint(asteroids_bp)
+
+
+    from utils.db import init_db  # Import here to avoid circular imports
+    init_db(app) # Pass the app to init_db()
+
+
+    return app
 
 
 
-app = Flask(__name__)
-
-def get_db_connection():
-    conn = psycopg2.connect(
-        host=os.environ.get("POSTGRES_HOST"),
-        database=os.environ.get("POSTGRES_DB"),
-        user=os.environ.get("POSTGRES_USER"),
-        password=os.environ.get("POSTGRES_PASSWORD")
-    )
-    return conn
+if __name__ == "__main__":
+    app = create_app()
+    app.run(debug=True, port=5005)
 
 
+./config.py:
+import os
 
-@app.route('/')
-def index():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute('SELECT * FROM Probes;')
-    probes = cur.fetchall()  # lowercase variable names for consistency
-    cur.close()
-    conn.close()
-    return render_template('index.html', probes=probes) # lowercase variable name here too
+class Config:
+    SECRET_KEY = os.environ.get("SECRET_KEY", "your_secret_key")  # Set a proper secret key for production
+    SQLALCHEMY_DATABASE_URI = f"postgresql://{os.environ.get('POSTGRES_USER')}:{os.environ.get('POSTGRES_PASSWORD')}@{os.environ.get('POSTGRES_HOST')}/{os.environ.get('POSTGRES_DB')}"
+    SQLALCHEMY_TRACK_MODIFICATIONS = False # Improves Performance
 
-@app.route('/probe/<int:probe_id>')
-def probe_details(probe_id):
-    conn = get_db_connection()
-    cur = conn.cursor()
-
-    cur.execute('SELECT * FROM Probes WHERE id = %s;', (probe_id,))
-    current_probe = cur.fetchone()
-
-    if not current_probe:  # Handle the case where the probe is not found
-        return "Probe not found", 404  # Or redirect to an error page
-
-
-    cur.execute('SELECT * FROM Probes;') # Fetch all probes for sidebar
-    probes = cur.fetchall()
-    cur.close()
-    conn.close()
-
-    return render_template('probe_details.html', current_probe=current_probe, probes=probes)  # Pass both variables
 
 ./init_db.py:
 import os
@@ -221,9 +228,45 @@ cur.close()
 conn.close()
 
 
+./03_Target_Structure.md:
+VONNEU/  <--  main project folder
+├── app.py                <-- Creates and configures the Flask app
+├── config.py             <-- Configuration settings
+├── requirements.txt     <-- Project dependencies
+├── .env                  <-- Environment variables
+├── static/              <-- Static assets (CSS, JS, images)
+│   ├── css/
+│   │   └── style.css
+│   └── js/
+│       └── scripts.js
+├── templates/           <-- HTML templates
+│   ├── base.html         <-- Base template
+│   ├── macros.html      <-- Jinja macros
+│   ├── probes/           <-- Templates for the probes Blueprint
+│   │   ├── list.html
+│   │   └── details.html
+│   └── asteroids/        <-- Templates for the asteroids Blueprint
+│       ├── index.html
+│       └── ...
+├── views/                <-- Presentation logic (views/controllers)
+│   ├── __init__.py
+│   ├── probes.py         <-- Probes Blueprint
+│   └── asteroids.py     <-- Asteroids Blueprint
+├── models/               <-- Database models (SQLAlchemy)
+│   ├── __init__.py
+│   ├── probe.py         <-- Probe model
+│   └── asteroid.py      <-- Asteroid model
+└── utils/                <-- Utility functions
+    ├── __init__.py
+    └── db.py              <-- Database connection management
+
+
 ./requirements.txt:
 Flask
 psycopg2-binary
+
+#SQL Handling
+flask_sqlalchemy
 
 # Loading .env 
 python-dotenv
@@ -237,8 +280,115 @@ POSTGRES_PASSWORD=mysecretpassword
 FLASK_APP=app
 FLASK_ENV=development
 
+./views/probes.py:
+from flask import Blueprint, render_template, current_app
+
+from models import Probe  # Import the Probe model
+
+probes_bp = Blueprint('probes', __name__, template_folder='../templates/probes')
+
+@probes_bp.route('/')  # The route remains the same
+def list_probes():     # Function name remains the same
+    probes = Probe.query.all()
+    return render_template('list.html', probes=probes)  # Updated template name
+
+
+@probes_bp.route('/<int:probe_id>')
+def details(probe_id):
+    probe = Probe.query.get_or_404(probe_id)
+    all_probes = Probe.query.all() # For the sidebar
+    return render_template('details.html', probe=probe, all_probes=all_probes) # Updated template name
+
+
+./views/__init__.py:
+from flask import Blueprint
+
+# Import the blueprints (to be defined below)
+from .probes import probes_bp
+from .asteroids import asteroids_bp
+
+
+./views/asteroids.py:
+from flask import Blueprint, render_template
+
+from models import Asteroid # Import Asteroid Model
+
+asteroids_bp = Blueprint('asteroids', __name__, url_prefix='/asteroids', template_folder='../templates/asteroids')
+
+@asteroids_bp.route('/')
+def index():
+     asteroids = Asteroid.query.all()
+     return render_template('index.html', asteroids=asteroids) #pass asteroids to template
+
+# ... (other asteroid routes)
+
+
+Error reading ./views/__pycache__/probes.cpython-38.pyc: 'utf-8' codec can't decode byte 0x86 in position 8: invalid start byte
+
+Error reading ./views/__pycache__/__init__.cpython-38.pyc: 'utf-8' codec can't decode byte 0xad in position 9: invalid start byte
+
+Error reading ./views/__pycache__/asteroids.cpython-38.pyc: 'utf-8' codec can't decode byte 0x8a in position 8: invalid start byte
+
+./utils/db.py:
+# utils/db.py
+from models import db  # Import the db instance from models/__init__.py
+
+
+def init_db(app): # app needs to be passed 
+    with app.app_context():
+        db.drop_all()   # In development/testing ONLY.  Use db.create_all() for production
+        db.create_all()
+
+        # Example of adding initial data (optional):
+        from models.probe import Probe  # Import within function to avoid circular imports
+        probe1 = Probe(type="Mk1", status="Docked")
+        db.session.add(probe1)
+        db.session.commit()
+
+Error reading ./utils/__pycache__/db.cpython-38.pyc: 'utf-8' codec can't decode byte 0xaf in position 9: invalid start byte
+
+./models/__init__.py:
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()  # Initialize SQLAlchemy
+
+# Import your models (to be defined below)
+from .probe import Probe
+from .asteroid import Asteroid
+
+
+./models/asteroid.py:
+from . import db
+
+class Asteroid(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    size = db.Column(db.BigInteger)  # Use BigInteger for large numbers
+    delta_v = db.Column(db.Integer)
+
+    def __repr__(self):
+        return f"<Asteroid {self.id}: Size={self.size} kg>"
+
+
+./models/probe.py:
+from . import db
+
+class Probe(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    type = db.Column(db.String(50), nullable=False)
+    build_time = db.Column(db.DateTime)
+    status = db.Column(db.String(50))
+
+    def __repr__(self):
+        return f"<Probe {self.id}: {self.type}>"
+
+
+Error reading ./models/__pycache__/asteroid.cpython-38.pyc: 'utf-8' codec can't decode byte 0xad in position 9: invalid start byte
+
+Error reading ./models/__pycache__/__init__.cpython-38.pyc: 'utf-8' codec can't decode byte 0xb8 in position 12: invalid start byte
+
+Error reading ./models/__pycache__/probe.cpython-38.pyc: 'utf-8' codec can't decode byte 0xfd in position 8: invalid start byte
+
 ./templates/base.html:
-<!-- templates/base.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -246,11 +396,13 @@ FLASK_ENV=development
     <title>{% block title %}{% endblock %} - FlaskApp</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body class="flex">  <!-- Add flex to body for layout -->
+<body class="flex">
     <div class="activity-bar w-24 bg-gray-800">
-        <a href="/" class="block py-2 px-4 text-gray-100 hover:bg-gray-700 {% if request.path == '/' %}bg-gray-900{% endif %}">Probes</a>
-        <a href="/asteroids" class="block py-2 px-4 text-gray-100 hover:bg-gray-700 {% if request.path == '/asteroids' %}bg-gray-900{% endif %}">Asteroids</a>
+        <a href="{{ url_for('probes.list_probes') }}" class="block py-2 px-4 text-gray-100 hover:bg-gray-700 {% if request.endpoint == 'probes.list_probes' %}bg-gray-900{% endif %}">Probes</a>
+        <a href="{{ url_for('asteroids.index') }}" class="block py-2 px-4 text-gray-100 hover:bg-gray-700 {% if request.endpoint == 'asteroids.index' %}bg-gray-900{% endif %}">Asteroids</a>
+
     </div>
+
 
     <div class="side-bar w-64 bg-gray-200 overflow-y-auto">
         {% block sidebar %}{% endblock %}
@@ -260,14 +412,35 @@ FLASK_ENV=development
         {% block content %}{% endblock %}
     </main>
 
+
+
     <script>
         // JavaScript can be added here if needed
     </script>
+
 </body>
 </html>
 
-./templates/index.html:
-<!-- templates/index.html -->
+./templates/asteroids/index.html:
+{% extends 'base.html' %}
+
+{% block title %}Asteroids{% endblock %}
+
+{% block sidebar %}
+    <p>Asteroid sidebar content here</p>
+{% endblock %}
+
+{% block content %}
+    <h1 class="text-3xl font-bold mb-4">Asteroids</h1>
+    <p>Main asteroids content here</p>
+     {% for asteroid in asteroids %}
+        <li>{{ asteroid.size}} kg</li>
+     {% endfor %}
+
+{% endblock %}
+
+./templates/probes/list.html:
+<!-- templates/probes/list.html -->
 {% extends 'base.html' %}
 
 {% block title %}Probes{% endblock %}
@@ -276,7 +449,7 @@ FLASK_ENV=development
     <ul>
         {% for probe in probes %}
         <li>
-            <a href="{{ url_for('probe_details', probe_id=probe[0]) }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300">{{ probe[1] }} (ID: {{ probe[0] }})</a>
+            <a href="{{ url_for('probes.details', probe_id=probe.id) }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300">{{ probe.type }} (ID: {{ probe.id }})</a>
         </li>
         {% endfor %}
     </ul>
@@ -288,8 +461,8 @@ FLASK_ENV=development
     <!-- Add content for the main probes overview if needed -->
 {% endblock %}
 
-./templates/probe_details.html:
-<!-- templates/probe_details.html -->
+./templates/probes/details.html:
+<!-- templates/probes/details.html -->
 {% extends 'base.html' %}
 
 {% block title %}Probe Details{% endblock %}
@@ -299,7 +472,7 @@ FLASK_ENV=development
     <ul>
         {% for probe in probes %}  <!-- Make sure 'probes' is passed to this template -->
         <li>
-            <a href="{{ url_for('probe_details', probe_id=probe[0]) }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300 {% if probe[0] == current_probe.id %}bg-gray-400{% endif %}">{{ probe[1] }} (ID: {{ probe[0] }})</a>
+            <a href="{{ url_for('probes.details', probe_id=probe.id) }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300 {% if probe.id == current_probe.id %}bg-gray-400{% endif %}">{{ probe.type }} (ID: {{ probe.id }})</a>
         </li>
         {% endfor %}
     </ul>

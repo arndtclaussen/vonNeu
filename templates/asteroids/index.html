@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Asteroids{% endblock %}
+
+{% block sidebar %}
+    <p>Asteroid sidebar content here</p>
+{% endblock %}
+
+{% block content %}
+    <h1 class="text-3xl font-bold mb-4">Asteroids</h1>
+    <p>Main asteroids content here</p>
+     {% for asteroid in asteroids %}
+        <li>{{ asteroid.size}} kg</li>
+     {% endfor %}
+
+{% endblock %}

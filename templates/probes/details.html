@@ -1,0 +1,25 @@
+<!-- templates/probes/details.html -->
+{% extends 'base.html' %}
+
+{% block title %}Probe Details{% endblock %}
+
+{% block sidebar %}
+    <ul>
+        {% for p in all_probes %}  <!-- Iterate through all_probes -->
+            <li>
+                <a href="{{ url_for('probes.details', probe_id=p.id) }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300 {% if p.id == probe.id %}bg-gray-400{% endif %}">{{ p.type }} (ID: {{ p.id }})</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+
+{% block content %}
+    <h1 class="text-3xl font-bold mb-4">Probe Details</h1>
+
+    <div class="probe p-4 m-2 bg-white rounded-lg shadow">
+        <h3 class="text-xl font-semibold">Probe ID: {{ probe.id }}</h3>
+        <p>Type: {{ probe.type }}</p>
+        <p>Build Time: {{ probe.build_time if probe.build_time is not none else "N/A" }}</p>  <!-- Corrected variable and null check -->
+        <p>Status: {{ probe.status }}</p>
+    </div>
+{% endblock %}

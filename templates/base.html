@@ -1,4 +1,3 @@
-<!-- templates/base.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,11 +5,13 @@
     <title>{% block title %}{% endblock %} - FlaskApp</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body class="flex">  <!-- Add flex to body for layout -->
+<body class="flex">
     <div class="activity-bar w-24 bg-gray-800">
-        <a href="/" class="block py-2 px-4 text-gray-100 hover:bg-gray-700 {% if request.path == '/' %}bg-gray-900{% endif %}">Probes</a>
-        <a href="/asteroids" class="block py-2 px-4 text-gray-100 hover:bg-gray-700 {% if request.path == '/asteroids' %}bg-gray-900{% endif %}">Asteroids</a>
+        <a href="{{ url_for('probes.list_probes') }}" class="block py-2 px-4 text-gray-100 hover:bg-gray-700 {% if request.endpoint == 'probes.list_probes' %}bg-gray-900{% endif %}">Probes</a>
+        <a href="{{ url_for('asteroids.index') }}" class="block py-2 px-4 text-gray-100 hover:bg-gray-700 {% if request.endpoint == 'asteroids.index' %}bg-gray-900{% endif %}">Asteroids</a>
+
     </div>
+
 
     <div class="side-bar w-64 bg-gray-200 overflow-y-auto">
         {% block sidebar %}{% endblock %}
@@ -20,8 +21,11 @@
         {% block content %}{% endblock %}
     </main>
 
+
+
     <script>
         // JavaScript can be added here if needed
     </script>
+
 </body>
 </html>
