@@ -162,3 +162,5 @@ cython_debug/
 #.idea/
 
 /env
+
+ZZ_Generated_prompt.txt

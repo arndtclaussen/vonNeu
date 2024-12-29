@@ -21,5 +21,6 @@
         <p>Type: {{ probe.type }}</p>
         <p>Build Time: {{ probe.build_time if probe.build_time is not none else "N/A" }}</p>  <!-- Corrected variable and null check -->
         <p>Status: {{ probe.status }}</p>
+        <p>Fuel: {{ probe.fuel }}</p>
     </div>
 {% endblock %}

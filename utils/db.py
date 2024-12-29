@@ -9,17 +9,17 @@ def init_db(app):
         # Check if probes already exist to prevent duplicate initial data
         if Probe.query.count() == 0:  # Only add if the table is empty
             probes_data = [
-                {"type": "Mk1", "status": "Docked", "full": 100},
-                {"type": "Mk2", "status": "Exploring", "full": 65},
-                {"type": "Mk1", "status": "Exploring", "full": 12},
-                {"type": "Mk3", "status": "Maintenance", "full": 88},  # Added more variety
-                {"type": "Mk2", "status": "In Transit", "full": None}, # None represents unknown fullness
-                {"type": "Mk1", "status": "Docked", "full": 5},       # Low fullness example
-                {"type": "Mk4", "status": "Construction", "full": 23}, # Different Status
+                {"type": "Mk1", "status": "Docked", "fuel": 100},
+                {"type": "Mk2", "status": "Exploring", "fuel": 65},
+                {"type": "Mk1", "status": "Exploring", "fuel": 12},
+                {"type": "Mk3", "status": "Maintenance", "fuel": 88},  # Added more variety
+                {"type": "Mk2", "status": "In Transit", "fuel": None}, # None represents unknown fuelness
+                {"type": "Mk1", "status": "Docked", "fuel": 5},       # Low fuelness example
+                {"type": "Mk4", "status": "Construction", "fuel": 23}, # Different Status
             ]
 
             for data in probes_data:
-                probe = Probe(type=data['type'], status=data['status'], full=data['full'])
+                probe = Probe(type=data['type'], status=data['status'], fuel=data['fuel'])
                 db.session.add(probe)
 
             db.session.commit()

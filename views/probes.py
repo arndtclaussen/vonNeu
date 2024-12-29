@@ -4,9 +4,9 @@ from models import Probe  # Import the Probe model
 probes_bp = Blueprint('probes', __name__, template_folder='../templates/probes')
 
 @probes_bp.route('/')
-def list_probes():
+def index():
     probes = Probe.query.all()
-    return render_template('list.html', probes=probes)
+    return render_template('index.html', probes=probes)
 
 @probes_bp.route('/<int:probe_id>')
 

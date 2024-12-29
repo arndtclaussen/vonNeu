@@ -16,8 +16,8 @@
 ./templates/base.html
 ./templates/asteroids/details.html
 ./templates/asteroids/index.html
-./templates/probes/list.html
 ./templates/probes/details.html
+./templates/probes/index.html
 
 2) File Content by File:
 ./02_README.md:
@@ -185,11 +185,12 @@ from models import Probe  # Import the Probe model
 probes_bp = Blueprint('probes', __name__, template_folder='../templates/probes')
 
 @probes_bp.route('/')
-def list_probes():
+def index():
     probes = Probe.query.all()
-    return render_template('list.html', probes=probes)
+    return render_template('index.html', probes=probes)
 
 @probes_bp.route('/<int:probe_id>')
+
 def details(probe_id):
     probe = Probe.query.get_or_404(probe_id)
     all_probes = Probe.query.all()  # Query all probes for the sidebar
@@ -216,6 +217,7 @@ def index():
     return render_template('index.html', asteroids=asteroids)
 
 @asteroids_bp.route('/<int:asteroid_id>')
+
 def details(asteroid_id):
     asteroid = Asteroid.query.get_or_404(asteroid_id)
     all_asteroids = Asteroid.query.all() # This line was missing or not working
@@ -307,7 +309,9 @@ class Probe(db.Model):
 </head>
 <body class="flex">
     <div class="activity-bar w-24 bg-gray-800">
-        <a href="{{ url_for('probes.list_probes') }}" class="block py-2 px-4 text-gray-100 hover:bg-gray-700 {% if request.endpoint == 'probes.list_probes' %}bg-gray-900{% endif %}">Probes</a>
+
+        <a href="{{ url_for('probes.index') }}" class="block py-2 px-4 text-gray-100 hover:bg-gray-700 {% if request.endpoint == 'probes.index' %}bg-gray-900{% endif %}">Probes</a>
+
         <a href="{{ url_for('asteroids.index') }}" class="block py-2 px-4 text-gray-100 hover:bg-gray-700 {% if request.endpoint == 'asteroids.index' %}bg-gray-900{% endif %}">Asteroids</a>
 
     </div>
@@ -375,28 +379,6 @@ class Probe(db.Model):
     <h1 class="text-3xl font-bold mb-4">Asteroids Overview</h1>
 {% endblock %}
 
-./templates/probes/list.html:
-<!-- templates/probes/list.html -->
-{% extends 'base.html' %}
-
-{% block title %}Probes{% endblock %}
-
-{% block sidebar %}
-    <ul>
-        {% for probe in probes %}
-        <li>
-            <a href="{{ url_for('probes.details', probe_id=probe.id) }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300">{{ probe.type }} (ID: {{ probe.id }})</a>
-        </li>
-        {% endfor %}
-    </ul>
-{% endblock %}
-
-
-{% block content %}
-    <h1 class="text-3xl font-bold mb-4">Probes Overview</h1>
-    <!-- Add content for the main probes overview if needed -->
-{% endblock %}
-
 ./templates/probes/details.html:
 <!-- templates/probes/details.html -->
 {% extends 'base.html' %}
@@ -421,6 +403,30 @@ class Probe(db.Model):
         <p>Type: {{ probe.type }}</p>
         <p>Build Time: {{ probe.build_time if probe.build_time is not none else "N/A" }}</p>  <!-- Corrected variable and null check -->
         <p>Status: {{ probe.status }}</p>
+        <p>Fullness: {{ probe.full }}</p>
     </div>
+{% endblock %}
+
+./templates/probes/index.html:
+<!-- templates/probes/index.html -->
+{% extends 'base.html' %}
+
+{% block title %}Probes{% endblock %}
+
+{% block sidebar %}
+    <ul>
+        {% for probe in probes %}
+        <li>
+            <a href="{{ url_for('probes.details', probe_id=probe.id) }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300">{{ probe.type }} (ID: {{ probe.id }})</a>
+            
+        </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+
+
+{% block content %}
+    <h1 class="text-3xl font-bold mb-4">Probes Overview</h1>
+    <!-- Add content for the main probes overview if needed -->
 {% endblock %}
 
