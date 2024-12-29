@@ -1,5 +1,5 @@
 # utils/db.py
-from models import db, Probe, Asteroid
+from models import db, Probe
 
 def init_db(app):
     with app.app_context():
@@ -24,14 +24,8 @@ def init_db(app):
 
             db.session.commit()
 
-        if Asteroid.query.count() == 0:
-            asteroids_data = [
-                {"size": 123456789012345, "delta_v": 3000},  # Example with BigInteger
-                {"size": 9876543210987, "delta_v": 1500}
-            ]
-            for data in asteroids_data:
-                asteroid = Asteroid(size=data['size'], delta_v=data['delta_v'])
-                db.session.add(asteroid)
-            db.session.commit()
+
+
+
 
 

@@ -182,7 +182,9 @@ FLASK_ENV=development
 from flask import Blueprint, render_template
 from models import Probe  # Import the Probe model
 
-probes_bp = Blueprint('probes', __name__, template_folder='../templates/probes')
+
+probes_bp = Blueprint('probes', __name__, url_prefix='/probes', template_folder='../templates/probes')
+
 
 @probes_bp.route('/')
 def index():
@@ -224,6 +226,7 @@ def details(asteroid_id):
     return render_template('details.html', asteroid=asteroid, all_asteroids=all_asteroids)
 		
 
+
 ./utils/db.py:
 # utils/db.py
 from models import db, Probe, Asteroid
@@ -236,17 +239,17 @@ def init_db(app):
         # Check if probes already exist to prevent duplicate initial data
         if Probe.query.count() == 0:  # Only add if the table is empty
             probes_data = [
-                {"type": "Mk1", "status": "Docked", "full": 100},
-                {"type": "Mk2", "status": "Exploring", "full": 65},
-                {"type": "Mk1", "status": "Exploring", "full": 12},
-                {"type": "Mk3", "status": "Maintenance", "full": 88},  # Added more variety
-                {"type": "Mk2", "status": "In Transit", "full": None}, # None represents unknown fullness
-                {"type": "Mk1", "status": "Docked", "full": 5},       # Low fullness example
-                {"type": "Mk4", "status": "Construction", "full": 23}, # Different Status
+                {"type": "Mk1", "status": "Docked", "fuel": 100},
+                {"type": "Mk2", "status": "Exploring", "fuel": 65},
+                {"type": "Mk1", "status": "Exploring", "fuel": 12},
+                {"type": "Mk3", "status": "Maintenance", "fuel": 88},  # Added more variety
+                {"type": "Mk2", "status": "In Transit", "fuel": None}, # None represents unknown fuelness
+                {"type": "Mk1", "status": "Docked", "fuel": 5},       # Low fuelness example
+                {"type": "Mk4", "status": "Construction", "fuel": 23}, # Different Status
             ]
 
             for data in probes_data:
-                probe = Probe(type=data['type'], status=data['status'], full=data['full'])
+                probe = Probe(type=data['type'], status=data['status'], fuel=data['fuel'])
                 db.session.add(probe)
 
             db.session.commit()
@@ -294,7 +297,7 @@ class Probe(db.Model):
     type = db.Column(db.String(50), nullable=False)
     build_time = db.Column(db.DateTime)
     status = db.Column(db.String(50))
-    full = db.Column(db.Integer)  # Add this line!
+    fuel = db.Column(db.Integer)  # Add this line!
 
     def __repr__(self):
         return f"&lt;Probe {self.id}: {self.type}>" 
@@ -309,13 +312,9 @@ class Probe(db.Model):
 </head>
 <body class="flex">
     <div class="activity-bar w-24 bg-gray-800">
-
-        <a href="{{ url_for('probes.index') }}" class="block py-2 px-4 text-gray-100 hover:bg-gray-700 {% if request.endpoint == 'probes.index' %}bg-gray-900{% endif %}">Probes</a>
-
-        <a href="{{ url_for('asteroids.index') }}" class="block py-2 px-4 text-gray-100 hover:bg-gray-700 {% if request.endpoint == 'asteroids.index' %}bg-gray-900{% endif %}">Asteroids</a>
-
+        <a href="{{ url_for('probes.index') }}" class="block py-2 px-4 text-gray-100 hover:bg-gray-700 {% if 'probes' in request.endpoint %}bg-gray-900{% endif %}">Probes</a>
+        <a href="{{ url_for('asteroids.index') }}" class="block py-2 px-4 text-gray-100 hover:bg-gray-700 {% if 'asteroids' in request.endpoint %}bg-gray-900{% endif %}">Asteroids</a>
     </div>
-
 
     <div class="side-bar w-64 bg-gray-200 overflow-y-auto">
         {% block sidebar %}{% endblock %}
@@ -325,12 +324,9 @@ class Probe(db.Model):
         {% block content %}{% endblock %}
     </main>
 
-
-
     <script>
         // JavaScript can be added here if needed
     </script>
-
 </body>
 </html>
 
@@ -367,17 +363,26 @@ class Probe(db.Model):
 
 {% block sidebar %}
     <ul>
-        {% for asteroid in asteroids %}
+        {% for a in asteroids %}
         <li>
-            <a href="{{ url_for('asteroids.details', asteroid_id=asteroid.id) }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300">{{ asteroid.size }} kg (ID: {{ asteroid.id }})</a>
+            <a href="{{ url_for('asteroids.details', asteroid_id=a.id) }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300">{{ a.size }} kg (ID: {{ a.id }})</a>
         </li>
         {% endfor %}
     </ul>
 {% endblock %}
 
 {% block content %}
-    <h1 class="text-3xl font-bold mb-4">Asteroids Overview</h1>
+    <h1 class="text-3xl font-bold mb-4">Asteroids Overview</h1>  <!-- Changed title -->
+    {% for a in asteroids %}
+        <div class="asteroid p-4 m-2 bg-white rounded-lg shadow">
+            <h3 class="text-xl font-semibold">Asteroid ID: {{ a.id }}</h3>
+            <p>Size: {{ a.size }} kg</p>
+            <p>Delta-V: {{ a.delta_v }} m/s</p>
+            <a href="{{ url_for('asteroids.details', asteroid_id=a.id) }}" class="text-blue-500 hover:underline">View Details</a>  <!-- Link to details -->
+        </div>
+    {% endfor %}
 {% endblock %}
+
 
 ./templates/probes/details.html:
 <!-- templates/probes/details.html -->
@@ -403,7 +408,7 @@ class Probe(db.Model):
         <p>Type: {{ probe.type }}</p>
         <p>Build Time: {{ probe.build_time if probe.build_time is not none else "N/A" }}</p>  <!-- Corrected variable and null check -->
         <p>Status: {{ probe.status }}</p>
-        <p>Fullness: {{ probe.full }}</p>
+        <p>Fuel: {{ probe.fuel }}</p>
     </div>
 {% endblock %}
 

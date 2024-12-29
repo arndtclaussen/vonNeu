@@ -1,7 +1,9 @@
 from flask import Blueprint, render_template
 from models import Probe  # Import the Probe model
 
-probes_bp = Blueprint('probes', __name__, template_folder='../templates/probes')
+
+probes_bp = Blueprint('probes', __name__, url_prefix='/probes', template_folder='../templates/probes')
+
 
 @probes_bp.route('/')
 def index():
