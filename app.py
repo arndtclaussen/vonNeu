@@ -18,6 +18,7 @@ def create_app(config_class=Config):
     db.init_app(app)
 
     app.register_blueprint(probes_bp)
+
     app.register_blueprint(asteroids_bp)
 
     from utils.db import init_db  # Import here to avoid circular imports
@@ -30,4 +31,9 @@ def create_app(config_class=Config):
 
 if __name__ == "__main__":
     app = create_app()
+
+    print("Jinja2 Loader:", app.jinja_loader)
+    for template_path in app.jinja_loader.searchpath:
+        print("Search Path:", template_path)
+
     app.run(debug=True, port=5005)

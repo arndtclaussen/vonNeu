@@ -1,21 +1,22 @@
-<!-- templates/probes/index.html -->
 {% extends 'base.html' %}
 
-{% block title %}Probes{% endblock %}
+{% block title %}Asteroids{% endblock %}
 
 {% block sidebar %}
     <ul>
-        {% for probe in probes %}
-        <li>
-            <a href="{{ url_for('probes.details', probe_id=probe.id) }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300">{{ probe.type }} (ID: {{ probe.id }})</a>
-            
-        </li>
+        {% for asteroid in asteroids %}
+            <li>
+                <a href="{{ url_for('asteroids.details', asteroid_id=asteroid.id) }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300">{{ asteroid.name }} (ID: {{ asteroid.id }})</a>
+            </li>
         {% endfor %}
     </ul>
 {% endblock %}
 
-
 {% block content %}
-    <h1 class="text-3xl font-bold mb-4">Probes Overview</h1>
-    <!-- Add content for the main probes overview if needed -->
+    <h1 class="text-3xl font-bold mb-4">Asteroids Overview</h1>
+    <ul>
+        {% for asteroid in asteroids %}
+        <li>{{ asteroid.name }} - {{ asteroid.composition }} (Size: {{ asteroid.size }})</li>
+        {% endfor %}
+    </ul>
 {% endblock %}

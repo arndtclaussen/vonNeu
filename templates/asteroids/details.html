@@ -1,26 +1,25 @@
-<!-- templates/asteroids/details.html -->
 {% extends 'base.html' %}
 
-{% block title %}Probe Details{% endblock %}
+{% block title %}Asteroid Details{% endblock %}
 
 {% block sidebar %}
     <ul>
-        {% for p in all_probes %}  <!-- Iterate through all_probes -->
+        {% for a in all_asteroids %}
             <li>
-                <a href="{{ url_for('probes.details', probe_id=p.id) }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300 {% if p.id == probe.id %}bg-gray-400{% endif %}">{{ p.type }} (ID: {{ p.id }})</a>
+                <a href="{{ url_for('asteroids.details', asteroid_id=a.id) }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300 {% if a.id == asteroid.id %}bg-gray-400{% endif %}">{{ a.name }} (ID: {{ a.id }})</a>
             </li>
         {% endfor %}
     </ul>
 {% endblock %}
 
 {% block content %}
-    <h1 class="text-3xl font-bold mb-4">Probe Details</h1>
+    <h1 class="text-3xl font-bold mb-4">Asteroid Details</h1>
 
-    <div class="probe p-4 m-2 bg-white rounded-lg shadow">
-        <h3 class="text-xl font-semibold">Probe ID: {{ probe.id }}</h3>
-        <p>Type: {{ probe.type }}</p>
-        <p>Build Time: {{ probe.build_time if probe.build_time is not none else "N/A" }}</p>  <!-- Corrected variable and null check -->
-        <p>Status: {{ probe.status }}</p>
-        <p>Fuel: {{ probe.fuel }}</p>
+    <div class="asteroid p-4 m-2 bg-white rounded-lg shadow">
+        <h3 class="text-xl font-semibold">Asteroid ID: {{ asteroid.id }}</h3>
+        <p>Name: {{ asteroid.name }}</p>
+        <p>Composition: {{ asteroid.composition }}</p>
+        <p>Size: {{ asteroid.size }}</p>
+         <p>Discovered at: {{ asteroid.discovered_at.strftime('%Y-%m-%d %H:%M:%S UTC') if asteroid.discovered_at else "N/A" }}</p>
     </div>
 {% endblock %}

@@ -57,7 +57,10 @@ if __name__ == "__main__":
         os.path.join(".", "views/__pycache__"),
         os.path.join(".", "models/__pycache__"),
         os.path.join(".", "utils/__pycache__"),
-        
+        os.path.join(".", "node_modules"),
+        os.path.join(".", "package-lock.json"),
+        os.path.join(".", "package.json"),
+         
 
                 
     ]

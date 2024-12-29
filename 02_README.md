@@ -41,6 +41,11 @@ export POSTGRES_PASSWORD="mysecretpassword"
 ## Bringin in Tailwind
 npx tailwindcss init
 
+ npm install -D tailwindcss
+ --> This installs node_modules folder and package-lock.json as well as package.json
+
+ bash npx tailwindcss -i ./templates/**/*.html -o static/tailwind.css
+
 
 ## References
 * Library Flask Example, see [here](https://www.digitalocean.com/community/tutorials/how-to-use-a-postgresql-database-in-a-flask-application).
