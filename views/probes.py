@@ -9,6 +9,7 @@ def list_probes():
     return render_template('list.html', probes=probes)
 
 @probes_bp.route('/<int:probe_id>')
+
 def details(probe_id):
     probe = Probe.query.get_or_404(probe_id)
     all_probes = Probe.query.all()  # Query all probes for the sidebar

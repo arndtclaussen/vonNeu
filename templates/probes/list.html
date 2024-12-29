@@ -8,6 +8,7 @@
         {% for probe in probes %}
         <li>
             <a href="{{ url_for('probes.details', probe_id=probe.id) }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300">{{ probe.type }} (ID: {{ probe.id }})</a>
+            
         </li>
         {% endfor %}
     </ul>

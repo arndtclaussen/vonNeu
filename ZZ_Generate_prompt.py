@@ -54,7 +54,12 @@ if __name__ == "__main__":
         os.path.join(".", "__pycache__"),
         os.path.join(".", ".gitignore"),
         os.path.join(".", "ZZ_Generate_prompt.py"),
+        os.path.join(".", "views/__pycache__"),
+        os.path.join(".", "models/__pycache__"),
+        os.path.join(".", "utils/__pycache__"),
         
+
+                
     ]
 
     list_files_recursive(directory_to_scan, output_filename, ignore_paths)

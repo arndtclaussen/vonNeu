@@ -4,25 +4,17 @@
 ./01_UI_Guide.md
 ./app.py
 ./config.py
-./init_db.py
-./03_Target_Structure.md
 ./requirements.txt
 ./.env
 ./views/probes.py
 ./views/__init__.py
 ./views/asteroids.py
-./views/__pycache__/probes.cpython-38.pyc
-./views/__pycache__/__init__.cpython-38.pyc
-./views/__pycache__/asteroids.cpython-38.pyc
 ./utils/db.py
-./utils/__pycache__/db.cpython-38.pyc
 ./models/__init__.py
 ./models/asteroid.py
 ./models/probe.py
-./models/__pycache__/asteroid.cpython-38.pyc
-./models/__pycache__/__init__.cpython-38.pyc
-./models/__pycache__/probe.cpython-38.pyc
 ./templates/base.html
+./templates/asteroids/details.html
 ./templates/asteroids/index.html
 ./templates/probes/list.html
 ./templates/probes/details.html
@@ -167,100 +159,6 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False # Improves Performance
 
 
-./init_db.py:
-import os
-import psycopg2
-
-conn = psycopg2.connect(
-        host="localhost",
-        database="vonneu_db",
-        user="myuser",
-        password="mysecretpassword")
-
-
-cur = conn.cursor()
-
-# Create Probes table
-cur.execute('DROP TABLE IF EXISTS Probes;')
-cur.execute('''CREATE TABLE Probes (
-                id integer PRIMARY KEY,
-                Type varchar(50) NOT NULL,
-                Build_Time timestamp,
-                Status varchar(50)
-                );''')
-
-# Insert data into Probes table
-cur.execute('''INSERT INTO Probes (id, Type, Build_Time, Status)
-            VALUES (%s, %s, %s, %s);''',
-            (12, 'Mk1', '2024-12-27 06:04:00', 'Docked'))
-
-cur.execute('''INSERT INTO Probes (id, Type, Build_Time, Status)
-            VALUES (%s, %s, %s, %s);''',
-            (13, 'Mk1', '2024-12-27 08:04:00', 'Exploring'))
-
-cur.execute('''INSERT INTO Probes (id, Type, Build_Time, Status)
-            VALUES (%s, %s, %s, %s);''',
-            (23, 'Mk2', None, 'In Production')) # Using None for NULL timestamp
-
-
-# Create Asteroids table
-cur.execute('DROP TABLE IF EXISTS Asteroids;')
-cur.execute('''CREATE TABLE Asteroids (
-                id integer PRIMARY KEY,
-                "Size (in kg)" bigint,  -- Use double quotes for column names with spaces
-                "Delta V" integer
-                );''')
-
-
-# Insert data into Asteroids table
-cur.execute('''INSERT INTO Asteroids (id, "Size (in kg)", "Delta V")
-            VALUES (%s, %s, %s);''',
-            (1, 1242, 100))
-
-cur.execute('''INSERT INTO Asteroids (id, "Size (in kg)", "Delta V")
-            VALUES (%s, %s, %s);''',
-            (2, 12423342234, 1002))
-
-
-conn.commit()
-
-cur.close()
-conn.close()
-
-
-./03_Target_Structure.md:
-VONNEU/  <--  main project folder
-├── app.py                <-- Creates and configures the Flask app
-├── config.py             <-- Configuration settings
-├── requirements.txt     <-- Project dependencies
-├── .env                  <-- Environment variables
-├── static/              <-- Static assets (CSS, JS, images)
-│   ├── css/
-│   │   └── style.css
-│   └── js/
-│       └── scripts.js
-├── templates/           <-- HTML templates
-│   ├── base.html         <-- Base template
-│   ├── macros.html      <-- Jinja macros
-│   ├── probes/           <-- Templates for the probes Blueprint
-│   │   ├── list.html
-│   │   └── details.html
-│   └── asteroids/        <-- Templates for the asteroids Blueprint
-│       ├── index.html
-│       └── ...
-├── views/                <-- Presentation logic (views/controllers)
-│   ├── __init__.py
-│   ├── probes.py         <-- Probes Blueprint
-│   └── asteroids.py     <-- Asteroids Blueprint
-├── models/               <-- Database models (SQLAlchemy)
-│   ├── __init__.py
-│   ├── probe.py         <-- Probe model
-│   └── asteroid.py      <-- Asteroid model
-└── utils/                <-- Utility functions
-    ├── __init__.py
-    └── db.py              <-- Database connection management
-
-
 ./requirements.txt:
 Flask
 psycopg2-binary
@@ -281,24 +179,21 @@ FLASK_APP=app
 FLASK_ENV=development
 
 ./views/probes.py:
-from flask import Blueprint, render_template, current_app
-
+from flask import Blueprint, render_template
 from models import Probe  # Import the Probe model
 
 probes_bp = Blueprint('probes', __name__, template_folder='../templates/probes')
 
-@probes_bp.route('/')  # The route remains the same
-def list_probes():     # Function name remains the same
+@probes_bp.route('/')
+def list_probes():
     probes = Probe.query.all()
-    return render_template('list.html', probes=probes)  # Updated template name
-
+    return render_template('list.html', probes=probes)
 
 @probes_bp.route('/<int:probe_id>')
 def details(probe_id):
     probe = Probe.query.get_or_404(probe_id)
-    all_probes = Probe.query.all() # For the sidebar
-    return render_template('details.html', probe=probe, all_probes=all_probes) # Updated template name
-
+    all_probes = Probe.query.all()  # Query all probes for the sidebar
+    return render_template('details.html', probe=probe, all_probes=all_probes) # Pass both probe and all_probes
 
 ./views/__init__.py:
 from flask import Blueprint
@@ -309,43 +204,63 @@ from .asteroids import asteroids_bp
 
 
 ./views/asteroids.py:
+# views/asteroids.py
 from flask import Blueprint, render_template
-
-from models import Asteroid # Import Asteroid Model
+from models import Asteroid
 
 asteroids_bp = Blueprint('asteroids', __name__, url_prefix='/asteroids', template_folder='../templates/asteroids')
 
 @asteroids_bp.route('/')
 def index():
-     asteroids = Asteroid.query.all()
-     return render_template('index.html', asteroids=asteroids) #pass asteroids to template
+    asteroids = Asteroid.query.all()
+    return render_template('index.html', asteroids=asteroids)
 
-# ... (other asteroid routes)
-
-
-Error reading ./views/__pycache__/probes.cpython-38.pyc: 'utf-8' codec can't decode byte 0x86 in position 8: invalid start byte
-
-Error reading ./views/__pycache__/__init__.cpython-38.pyc: 'utf-8' codec can't decode byte 0xad in position 9: invalid start byte
-
-Error reading ./views/__pycache__/asteroids.cpython-38.pyc: 'utf-8' codec can't decode byte 0x8a in position 8: invalid start byte
+@asteroids_bp.route('/<int:asteroid_id>')
+def details(asteroid_id):
+    asteroid = Asteroid.query.get_or_404(asteroid_id)
+    all_asteroids = Asteroid.query.all() # This line was missing or not working
+    return render_template('details.html', asteroid=asteroid, all_asteroids=all_asteroids)
+		
 
 ./utils/db.py:
 # utils/db.py
-from models import db  # Import the db instance from models/__init__.py
+from models import db, Probe, Asteroid
 
-
-def init_db(app): # app needs to be passed 
+def init_db(app):
     with app.app_context():
-        db.drop_all()   # In development/testing ONLY.  Use db.create_all() for production
-        db.create_all()
+        db.drop_all()
+        db.create_all()  # Remove db.drop_all() unless you REALLY want to reset the db every time
 
-        # Example of adding initial data (optional):
-        from models.probe import Probe  # Import within function to avoid circular imports
-        probe1 = Probe(type="Mk1", status="Docked")
-        db.session.add(probe1)
-        db.session.commit()
+        # Check if probes already exist to prevent duplicate initial data
+        if Probe.query.count() == 0:  # Only add if the table is empty
+            probes_data = [
+                {"type": "Mk1", "status": "Docked", "full": 100},
+                {"type": "Mk2", "status": "Exploring", "full": 65},
+                {"type": "Mk1", "status": "Exploring", "full": 12},
+                {"type": "Mk3", "status": "Maintenance", "full": 88},  # Added more variety
+                {"type": "Mk2", "status": "In Transit", "full": None}, # None represents unknown fullness
+                {"type": "Mk1", "status": "Docked", "full": 5},       # Low fullness example
+                {"type": "Mk4", "status": "Construction", "full": 23}, # Different Status
+            ]
 
-Error reading ./utils/__pycache__/db.cpython-38.pyc: 'utf-8' codec can't decode byte 0xaf in position 9: invalid start byte
+            for data in probes_data:
+                probe = Probe(type=data['type'], status=data['status'], full=data['full'])
+                db.session.add(probe)
+
+            db.session.commit()
+
+        if Asteroid.query.count() == 0:
+            asteroids_data = [
+                {"size": 123456789012345, "delta_v": 3000},  # Example with BigInteger
+                {"size": 9876543210987, "delta_v": 1500}
+            ]
+            for data in asteroids_data:
+                asteroid = Asteroid(size=data['size'], delta_v=data['delta_v'])
+                db.session.add(asteroid)
+            db.session.commit()
+
+
+
 
 ./models/__init__.py:
 from flask_sqlalchemy import SQLAlchemy
@@ -377,16 +292,10 @@ class Probe(db.Model):
     type = db.Column(db.String(50), nullable=False)
     build_time = db.Column(db.DateTime)
     status = db.Column(db.String(50))
+    full = db.Column(db.Integer)  # Add this line!
 
     def __repr__(self):
-        return f"<Probe {self.id}: {self.type}>"
-
-
-Error reading ./models/__pycache__/asteroid.cpython-38.pyc: 'utf-8' codec can't decode byte 0xad in position 9: invalid start byte
-
-Error reading ./models/__pycache__/__init__.cpython-38.pyc: 'utf-8' codec can't decode byte 0xb8 in position 12: invalid start byte
-
-Error reading ./models/__pycache__/probe.cpython-38.pyc: 'utf-8' codec can't decode byte 0xfd in position 8: invalid start byte
+        return f"&lt;Probe {self.id}: {self.type}>" 
 
 ./templates/base.html:
 <!DOCTYPE html>
@@ -421,22 +330,49 @@ Error reading ./models/__pycache__/probe.cpython-38.pyc: 'utf-8' codec can't dec
 </body>
 </html>
 
+./templates/asteroids/details.html:
+<!-- templates/asteroids/details.html -->
+{% extends 'base.html' %}
+
+{% block title %}Asteroid Details{% endblock %}
+
+{% block sidebar %}
+    <ul>
+        {% for a in all_asteroids %}
+            <li>
+                <a href="{{ url_for('asteroids.details', asteroid_id=a.id) }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300 {% if a.id == asteroid.id %}bg-gray-400{% endif %}">{{ a.size }} kg (ID: {{ a.id }})</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+{% block content %}
+    <h1 class="text-3xl font-bold mb-4">Asteroid Details</h1>
+    <div class="asteroid p-4 m-2 bg-white rounded-lg shadow">
+        <h3 class="text-xl font-semibold">Asteroid ID: {{ asteroid.id }}</h3>
+        <p>Size: {{ asteroid.size }} kg</p>
+        <p>Delta-V: {{ asteroid.delta_v }} m/s</p>
+    </div>
+{% endblock %}
+
+
 ./templates/asteroids/index.html:
+<!-- templates/asteroids/index.html -->
 {% extends 'base.html' %}
 
 {% block title %}Asteroids{% endblock %}
 
 {% block sidebar %}
-    <p>Asteroid sidebar content here</p>
+    <ul>
+        {% for asteroid in asteroids %}
+        <li>
+            <a href="{{ url_for('asteroids.details', asteroid_id=asteroid.id) }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300">{{ asteroid.size }} kg (ID: {{ asteroid.id }})</a>
+        </li>
+        {% endfor %}
+    </ul>
 {% endblock %}
 
 {% block content %}
-    <h1 class="text-3xl font-bold mb-4">Asteroids</h1>
-    <p>Main asteroids content here</p>
-     {% for asteroid in asteroids %}
-        <li>{{ asteroid.size}} kg</li>
-     {% endfor %}
-
+    <h1 class="text-3xl font-bold mb-4">Asteroids Overview</h1>
 {% endblock %}
 
 ./templates/probes/list.html:
@@ -468,26 +404,23 @@ Error reading ./models/__pycache__/probe.cpython-38.pyc: 'utf-8' codec can't dec
 {% block title %}Probe Details{% endblock %}
 
 {% block sidebar %}
-    <!-- You can keep the same sidebar as the index.html or customize it -->
     <ul>
-        {% for probe in probes %}  <!-- Make sure 'probes' is passed to this template -->
-        <li>
-            <a href="{{ url_for('probes.details', probe_id=probe.id) }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300 {% if probe.id == current_probe.id %}bg-gray-400{% endif %}">{{ probe.type }} (ID: {{ probe.id }})</a>
-        </li>
+        {% for p in all_probes %}  <!-- Iterate through all_probes -->
+            <li>
+                <a href="{{ url_for('probes.details', probe_id=p.id) }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300 {% if p.id == probe.id %}bg-gray-400{% endif %}">{{ p.type }} (ID: {{ p.id }})</a>
+            </li>
         {% endfor %}
     </ul>
 {% endblock %}
-
 
 {% block content %}
     <h1 class="text-3xl font-bold mb-4">Probe Details</h1>
 
     <div class="probe p-4 m-2 bg-white rounded-lg shadow">
-        <h3 class="text-xl font-semibold">Probe ID: {{ current_probe[0] }}</h3>
-        <p>Type: {{ current_probe[1] }}</p>
-        <p>Build Time: {{ current_probe[2] if current_probe[2] is not none else "N/A" }}</p>
-        <p>Status: {{ current_probe[3] }}</p>
+        <h3 class="text-xl font-semibold">Probe ID: {{ probe.id }}</h3>
+        <p>Type: {{ probe.type }}</p>
+        <p>Build Time: {{ probe.build_time if probe.build_time is not none else "N/A" }}</p>  <!-- Corrected variable and null check -->
+        <p>Status: {{ probe.status }}</p>
     </div>
-
 {% endblock %}
 
