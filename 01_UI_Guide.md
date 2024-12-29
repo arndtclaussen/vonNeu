@@ -30,3 +30,17 @@ Located below the Main Area. Initially, a "Game Logs" panel will display message
 * The player interacts with the game elements in the Main Area 
 * Game events and updates are logged in the Game Logs panel.
 
+# Design
+
++-------------------------------------------------------------------------+
+| Activity Bar | Side Bar       | Main Panel (e.g. details of probes)     |
+| (Probes,     | (List of       |                                         |
+| Asteroids)   |  probes)       |                                         |
+|              |                |                                         |
+|              |                |                                         |
+|              |                | ----------------------------------------+
+|              |                |                                         |
+| 	           |                | Game Log                                |
+|              |                |                                         |
++-------------------------------------------------------------------------+
+

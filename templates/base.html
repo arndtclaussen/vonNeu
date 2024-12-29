@@ -1,26 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}{% endblock %} - FlaskApp</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body class="flex">
-    <div class="activity-bar w-24 bg-gray-800">
-        <a href="{{ url_for('probes.index') }}" class="block py-2 px-4 text-gray-100 hover:bg-gray-700 {% if 'probes' in request.endpoint %}bg-gray-900{% endif %}">Probes</a>
-        <a href="{{ url_for('asteroids.index') }}" class="block py-2 px-4 text-gray-100 hover:bg-gray-700 {% if 'asteroids' in request.endpoint %}bg-gray-900{% endif %}">Asteroids</a>
+
+<body class="flex h-screen">
+    <div class="activity-bar w-24 bg-gray-800 flex flex-col">
+        <a href="{{ url_for('probes.index') }}"
+            class="block py-2 px-4 text-gray-100 hover:bg-gray-700 {% if 'probes' in request.endpoint %}bg-gray-900{% endif %}">Probes</a>
+        <a href="{{ url_for('asteroids.index') }}"
+            class="block py-2 px-4 text-gray-100 hover:bg-gray-700 {% if 'asteroids' in request.endpoint %}bg-gray-900{% endif %}">Asteroids</a>
+        <div class="flex-grow"></div>
     </div>
 
-   <div class="side-bar w-64 bg-gray-200 overflow-y-auto">
+    <div class="side-bar w-64 bg-gray-200 overflow-y-auto">
         {% block sidebar %}{% endblock %}
     </div>
 
-    <main class="editor-area flex-1 p-4 bg-gray-100">
-        {% block content %}{% endblock %}
+    <main class="editor-area flex-1 p-4 bg-gray-100 flex flex-col">
+        <div class="main-content flex-grow">
+            {% block content %}{% endblock %}
+        </div>
+        <div class="game-log mt-4 p-2 bg-white border border-gray-300 rounded overflow-y-auto" style="flex-basis: 25%;">
+            <h3>Game Log</h3>
+            <div id="game-log-content">
+                {% block game_log %}
+                    <p> "2024-07-27 10:00:00 - Asteroid Found", </p>
+                    <p> "2024-07-27 10:05:00 - Probe Fuel Low", </p>      
+                    <p> "2024-07-27 10:10:00 - Asteroid Scanned: Rich in Iron" </p>    
+                {% endblock %}
+            </div>
+        </div>
     </main>
+
 
     <script>
         // JavaScript can be added here if needed
     </script>
 </body>
+
 </html>

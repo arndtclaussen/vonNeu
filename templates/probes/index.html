@@ -14,5 +14,9 @@
 
 {% block content %}
     <h1 class="text-3xl font-bold mb-4">Probes Overview</h1>
-    <!-- Add content for the main probes overview if needed -->
+    <ul>
+        {% for probe in probes %}
+        <li>{{ probe.id }} - {{ probe.type }} (Comment: {{ probe.id }})</li>
+        {% endfor %}
+    </ul>
 {% endblock %}
