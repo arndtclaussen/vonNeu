@@ -1,0 +1,21 @@
+<!-- templates/probes/index.html -->
+{% extends 'base.html' %}
+
+{% block title %}Probes{% endblock %}
+
+{% block sidebar %}
+    <ul>
+        {% for probe in probes %}
+        <li>
+            <a href="{{ url_for('probes.details', probe_id=probe.id) }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300">{{ probe.type }} (ID: {{ probe.id }})</a>
+            
+        </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+
+
+{% block content %}
+    <h1 class="text-3xl font-bold mb-4">Probes Overview</h1>
+    <!-- Add content for the main probes overview if needed -->
+{% endblock %}

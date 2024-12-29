@@ -8,14 +8,10 @@
 ./.env
 ./views/probes.py
 ./views/__init__.py
-./views/asteroids.py
 ./utils/db.py
 ./models/__init__.py
-./models/asteroid.py
 ./models/probe.py
 ./templates/base.html
-./templates/asteroids/details.html
-./templates/asteroids/index.html
 ./templates/probes/details.html
 ./templates/probes/index.html
 
@@ -123,7 +119,7 @@ from dotenv import load_dotenv
 from config import Config
 from models import db
 from utils.db import init_db # Function to initialize database
-from views import probes_bp, asteroids_bp
+from views import probes_bp
 
 load_dotenv()
 
@@ -134,7 +130,6 @@ def create_app(config_class=Config):
     db.init_app(app)
 
     app.register_blueprint(probes_bp)
-    app.register_blueprint(asteroids_bp)
 
 
     from utils.db import init_db  # Import here to avoid circular imports
@@ -203,33 +198,13 @@ from flask import Blueprint
 
 # Import the blueprints (to be defined below)
 from .probes import probes_bp
-from .asteroids import asteroids_bp
 
 
-./views/asteroids.py:
-# views/asteroids.py
-from flask import Blueprint, render_template
-from models import Asteroid
-
-asteroids_bp = Blueprint('asteroids', __name__, url_prefix='/asteroids', template_folder='../templates/asteroids')
-
-@asteroids_bp.route('/')
-def index():
-    asteroids = Asteroid.query.all()
-    return render_template('index.html', asteroids=asteroids)
-
-@asteroids_bp.route('/<int:asteroid_id>')
-
-def details(asteroid_id):
-    asteroid = Asteroid.query.get_or_404(asteroid_id)
-    all_asteroids = Asteroid.query.all() # This line was missing or not working
-    return render_template('details.html', asteroid=asteroid, all_asteroids=all_asteroids)
-		
 
 
 ./utils/db.py:
 # utils/db.py
-from models import db, Probe, Asteroid
+from models import db, Probe
 
 def init_db(app):
     with app.app_context():
@@ -254,15 +229,9 @@ def init_db(app):
 
             db.session.commit()
 
-        if Asteroid.query.count() == 0:
-            asteroids_data = [
-                {"size": 123456789012345, "delta_v": 3000},  # Example with BigInteger
-                {"size": 9876543210987, "delta_v": 1500}
-            ]
-            for data in asteroids_data:
-                asteroid = Asteroid(size=data['size'], delta_v=data['delta_v'])
-                db.session.add(asteroid)
-            db.session.commit()
+
+
+
 
 
 
@@ -274,19 +243,8 @@ db = SQLAlchemy()  # Initialize SQLAlchemy
 
 # Import your models (to be defined below)
 from .probe import Probe
-from .asteroid import Asteroid
 
 
-./models/asteroid.py:
-from . import db
-
-class Asteroid(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    size = db.Column(db.BigInteger)  # Use BigInteger for large numbers
-    delta_v = db.Column(db.Integer)
-
-    def __repr__(self):
-        return f"<Asteroid {self.id}: Size={self.size} kg>"
 
 
 ./models/probe.py:
@@ -313,10 +271,10 @@ class Probe(db.Model):
 <body class="flex">
     <div class="activity-bar w-24 bg-gray-800">
         <a href="{{ url_for('probes.index') }}" class="block py-2 px-4 text-gray-100 hover:bg-gray-700 {% if 'probes' in request.endpoint %}bg-gray-900{% endif %}">Probes</a>
-        <a href="{{ url_for('asteroids.index') }}" class="block py-2 px-4 text-gray-100 hover:bg-gray-700 {% if 'asteroids' in request.endpoint %}bg-gray-900{% endif %}">Asteroids</a>
+
     </div>
 
-    <div class="side-bar w-64 bg-gray-200 overflow-y-auto">
+   <div class="side-bar w-64 bg-gray-200 overflow-y-auto">
         {% block sidebar %}{% endblock %}
     </div>
 
@@ -329,60 +287,6 @@ class Probe(db.Model):
     </script>
 </body>
 </html>
-
-./templates/asteroids/details.html:
-<!-- templates/asteroids/details.html -->
-{% extends 'base.html' %}
-
-{% block title %}Asteroid Details{% endblock %}
-
-{% block sidebar %}
-    <ul>
-        {% for a in all_asteroids %}
-            <li>
-                <a href="{{ url_for('asteroids.details', asteroid_id=a.id) }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300 {% if a.id == asteroid.id %}bg-gray-400{% endif %}">{{ a.size }} kg (ID: {{ a.id }})</a>
-            </li>
-        {% endfor %}
-    </ul>
-{% endblock %}
-{% block content %}
-    <h1 class="text-3xl font-bold mb-4">Asteroid Details</h1>
-    <div class="asteroid p-4 m-2 bg-white rounded-lg shadow">
-        <h3 class="text-xl font-semibold">Asteroid ID: {{ asteroid.id }}</h3>
-        <p>Size: {{ asteroid.size }} kg</p>
-        <p>Delta-V: {{ asteroid.delta_v }} m/s</p>
-    </div>
-{% endblock %}
-
-
-./templates/asteroids/index.html:
-<!-- templates/asteroids/index.html -->
-{% extends 'base.html' %}
-
-{% block title %}Asteroids{% endblock %}
-
-{% block sidebar %}
-    <ul>
-        {% for a in asteroids %}
-        <li>
-            <a href="{{ url_for('asteroids.details', asteroid_id=a.id) }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300">{{ a.size }} kg (ID: {{ a.id }})</a>
-        </li>
-        {% endfor %}
-    </ul>
-{% endblock %}
-
-{% block content %}
-    <h1 class="text-3xl font-bold mb-4">Asteroids Overview</h1>  <!-- Changed title -->
-    {% for a in asteroids %}
-        <div class="asteroid p-4 m-2 bg-white rounded-lg shadow">
-            <h3 class="text-xl font-semibold">Asteroid ID: {{ a.id }}</h3>
-            <p>Size: {{ a.size }} kg</p>
-            <p>Delta-V: {{ a.delta_v }} m/s</p>
-            <a href="{{ url_for('asteroids.details', asteroid_id=a.id) }}" class="text-blue-500 hover:underline">View Details</a>  <!-- Link to details -->
-        </div>
-    {% endfor %}
-{% endblock %}
-
 
 ./templates/probes/details.html:
 <!-- templates/probes/details.html -->

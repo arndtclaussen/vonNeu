@@ -5,7 +5,9 @@ from dotenv import load_dotenv
 from config import Config
 from models import db
 from utils.db import init_db # Function to initialize database
-from views import probes_bp
+
+from views import probes_bp, asteroids_bp
+
 
 load_dotenv()
 
@@ -16,7 +18,7 @@ def create_app(config_class=Config):
     db.init_app(app)
 
     app.register_blueprint(probes_bp)
-
+    app.register_blueprint(asteroids_bp)
 
     from utils.db import init_db  # Import here to avoid circular imports
     init_db(app) # Pass the app to init_db()
