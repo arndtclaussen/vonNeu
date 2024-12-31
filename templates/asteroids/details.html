@@ -20,6 +20,9 @@
         <p>Name: {{ asteroid.name }}</p>
         <p>Composition: {{ asteroid.composition }}</p>
         <p>Size: {{ asteroid.size }}</p>
-         <p>Discovered at: {{ asteroid.discovered_at.strftime('%Y-%m-%d %H:%M:%S UTC') if asteroid.discovered_at else "N/A" }}</p>
+        <p>Discovered at: {{ asteroid.discovered_at.strftime('%Y-%m-%d %H:%M:%S UTC') if asteroid.discovered_at else "N/A" }}</p>
+
+        <p>Location: ({{ asteroid.x_coordinate }}, {{ asteroid.y_coordinate }})</p>  
+        <p>Delta V: ({{ asteroid.delta_v_x }}, {{ asteroid.delta_v_y }})</p> 
     </div>
 {% endblock %}

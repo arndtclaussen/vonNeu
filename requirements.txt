@@ -6,3 +6,7 @@ flask_sqlalchemy
 
 # Loading .env 
 python-dotenv
+
+# Redis Queue 
+rq 
+redis

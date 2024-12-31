@@ -47,6 +47,23 @@ npx tailwindcss init
  bash npx tailwindcss -i ./templates/**/*.html -o static/tailwind.css
 
 
+## Redis que
+See here for details: https://redis.io/learn/howtos/quick-start
+
+``` 
+docker run --name redis-vonneu -d -p 6379:6379 redis
+docker run -d --name redis-vonneu -p 6379:6379 -p 8001:8001 redis/redis-stack:latest
+```
+Then to start
+```
+rq worker -with-scheduler
+```
+
+There is a dashboard
+
+
+
+
 ## References
 * Library Flask Example, see [here](https://www.digitalocean.com/community/tutorials/how-to-use-a-postgresql-database-in-a-flask-application).
 
