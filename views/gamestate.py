@@ -24,6 +24,7 @@ def action():
 def advance_time_route():  # Rename the route handler
     return advance_time()  # Call the controller function
 
+
 '''
 @gamestate_bp.route('/advance_time', methods=['POST'])
 def advance_time():

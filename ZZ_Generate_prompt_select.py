@@ -46,8 +46,7 @@ if __name__ == "__main__":
         os.path.join(".", "app.py"), # Example file
         os.path.join(".", "utils"),  # Example directory
         os.path.join(".", "models"),  # Example directory
-        os.path.join(".", "tasks"),  # Example directory
-        
+     
         
         # ... other files/directories you select
     ]
