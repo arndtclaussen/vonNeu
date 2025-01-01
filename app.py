@@ -3,35 +3,26 @@ from flask import Flask
 from dotenv import load_dotenv
 
 from config import Config
-from models import db
-from utils.db import init_db # Function to initialize database
-
+from models import db, init_db  # Import init_db directly from models
 from views import probes_bp, asteroids_bp
 
-
-import json
-
-
-
-
 load_dotenv()
+
+
 
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
     db.init_app(app)
+    init_db(app)  # Call init_db here
 
     app.register_blueprint(probes_bp)
 
     app.register_blueprint(asteroids_bp)
 
-    from utils.db import init_db  # Import here to avoid circular imports
-    init_db(app) # Pass the app to init_db()
-
 
     return app
-
 
 
 
