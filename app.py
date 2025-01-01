@@ -11,7 +11,6 @@ from views import probes_bp, asteroids_bp
 
 import json
 
-from tasks import initialize_game_state  # Import your function
 
 
 
@@ -43,7 +42,4 @@ if __name__ == "__main__":
     for template_path in app.jinja_loader.searchpath:
         print("Search Path:", template_path)
 
-    with app.app_context(): # Use app context for database operations
-        initialize_game_state() # Initial call to enqueue the task
-    
     app.run(debug=True, port=5005)
