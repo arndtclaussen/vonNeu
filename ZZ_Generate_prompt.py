@@ -54,10 +54,13 @@ if __name__ == "__main__":
         os.path.join(".", "__pycache__"),
         os.path.join(".", ".gitignore"),
         os.path.join(".", "ZZ_Generate_prompt.py"),
+        os.path.join(".", "ZZ_Generate_prompt_select.py"),
+        os.path.join(".", "ZZ_Generate_prompt_select.txt"),        
         os.path.join(".", "views/__pycache__"),
         os.path.join(".", "models/__pycache__"),
         os.path.join(".", "utils/__pycache__"),
-         
+        os.path.join(".", "tasks/__pycache__"),
+
                 
     ]
 
