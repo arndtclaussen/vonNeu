@@ -1,0 +1,47 @@
+
+<!-- templates/gamestate/action.html -->
+{% extends 'base.html' %}
+
+{% block title %}Gamestate Actions{% endblock %}
+
+{% block sidebar %}
+    <ul>
+        <li><a href="{{ url_for('gamestate.overview') }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300 {% if request.endpoint.startswith('gamestate.overview') %}bg-gray-400{% endif %}">Overview</a></li>
+        <li><a href="{{ url_for('gamestate.action') }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300 {% if request.endpoint.startswith('gamestate.action') %}bg-gray-400{% endif %}">Action</a></li>
+    </ul>
+{% endblock %}
+
+{% block content %}
+    <h1>Game State Actions</h1>
+
+    <div>
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="advance-time-button">
+            Next 5 Seconds
+        </button>
+    </div>
+
+
+    <div id="action-results" class="mt-4">
+        </div>
+
+
+    <script>
+        const advanceTimeButton = document.getElementById('advance-time-button');
+        const actionResultsDiv = document.getElementById('action-results');
+
+
+        advanceTimeButton.addEventListener('click', () => {
+            // Here you would make an AJAX request to your Flask backend
+            // to update the game state.
+
+            // Placeholder for now:
+            actionResultsDiv.innerHTML = "<p>Advancing time (AJAX request would go here)...</p>";
+
+
+
+        });
+    </script>
+
+
+
+{% endblock %}

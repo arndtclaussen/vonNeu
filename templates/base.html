@@ -9,6 +9,9 @@
 
 <body class="flex h-screen">
     <div class="activity-bar w-24 bg-gray-800 flex flex-col">
+       
+        <a href="{{ url_for('gamestate.overview') }}" class="block py-2 px-4 text-gray-100 hover:bg-gray-700 {% if request.endpoint.startswith('gamestate.') %}bg-gray-900{% endif %}">Time</a>
+
         <a href="{{ url_for('probes.index') }}"
             class="block py-2 px-4 text-gray-100 hover:bg-gray-700 {% if 'probes' in request.endpoint %}bg-gray-900{% endif %}">Probes</a>
         <a href="{{ url_for('asteroids.index') }}"

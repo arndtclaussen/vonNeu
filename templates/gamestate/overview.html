@@ -1,0 +1,25 @@
+<!-- templates/gamestate/overview.html -->
+{% extends 'base.html' %}
+
+{% block title %}Gamestate Overview{% endblock %}
+
+{% block sidebar %}
+    <ul>
+        <li><a href="{{ url_for('gamestate.overview') }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300 {% if request.endpoint.startswith('gamestate.overview') %}bg-gray-400{% endif %}">Overview</a></li>
+        <li><a href="{{ url_for('gamestate.action') }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300 {% if request.endpoint.startswith('gamestate.action') %}bg-gray-400{% endif %}">Action</a></li>
+    </ul>
+{% endblock %}
+
+{% block content %}
+    <h1>Game State Overview</h1>
+
+    {% if gamestate %}
+        <p>Current Game Time: {{ gamestate.game_time.strftime('%Y-%m-%d %H:%M:%S UTC') }}</p>  </p>
+        <p>Time Rate: {{ gamestate.time_rate }}x</p>
+    {% else %}
+        <p class="text-red-500">Game state not found!</p>  <!-- Error message -->
+    {% endif %}
+
+{% endblock %}
+
+
