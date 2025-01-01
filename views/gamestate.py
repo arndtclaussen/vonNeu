@@ -1,5 +1,6 @@
-from flask import Blueprint, render_template
-from models import GameState  # Import GameState
+from flask import Blueprint, render_template, jsonify
+from models import GameState, db
+from datetime import timedelta
 
 gamestate_bp = Blueprint('gamestate', __name__, url_prefix='/gamestate', template_folder='../templates/gamestate')
 
@@ -12,3 +13,15 @@ def overview():
 @gamestate_bp.route('/action') # Route is /gamestate/action
 def action():
     return render_template('gamestate/action.html')
+
+
+
+@gamestate_bp.route('/advance_time', methods=['POST'])
+def advance_time():
+    gamestate = GameState.query.first()
+    if gamestate:
+        gamestate.game_time += timedelta(seconds=5)  # Add 5 seconds
+        db.session.commit()
+        return jsonify({'new_time': gamestate.game_time.strftime('%Y-%m-%d %H:%M:%S UTC')})
+    else:
+        return jsonify({'error': 'Game state not found'}), 404  # Return 404 if not found
