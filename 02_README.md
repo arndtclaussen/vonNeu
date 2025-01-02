@@ -57,6 +57,7 @@ docker run -d --name redis-vonneu -p 6379:6379 -p 8001:8001 redis/redis-stack:la
 Then to start
 ```
 rq worker -with-scheduler
+rq worker teste_me -with-scheduler
 ```
 
 There is a dashboard
