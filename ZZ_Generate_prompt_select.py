@@ -44,9 +44,11 @@ if __name__ == "__main__":
     base_directory = "."  # Or specify a different base directory if needed
     selected_items = [
         os.path.join(".", "app.py"), # Example file
-        os.path.join(".", "utils"),  # Example directory
         os.path.join(".", "models"),  # Example directory
-     
+        os.path.join(".", "controllers"),  # Example directory
+        os.path.join(".", "02_README.md"),  # Example directory
+        os.path.join(".", "03_RQ.md"),  # Example directory
+        
         
         # ... other files/directories you select
     ]
