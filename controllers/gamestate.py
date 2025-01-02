@@ -26,3 +26,9 @@ def advance_time():
         return jsonify({'new_time': gamestate.game_time.strftime('%Y-%m-%d %H:%M:%S UTC')}), 200 # Explicit 200 OK status
     else:
         return jsonify({'error': 'Game state not found'}), 404
+    
+
+
+def hello_world():
+    print("hi")
+    

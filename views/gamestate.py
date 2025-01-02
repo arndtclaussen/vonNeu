@@ -3,7 +3,7 @@ from models import GameState, db
 from datetime import timedelta
 
 
-from controllers.gamestate import advance_time  # Import your controller function
+from controllers.gamestate import advance_time, hello_world
 
 from rq import Queue
 from redis import Redis
@@ -35,7 +35,6 @@ def schedule_hello():
     try:
         redis_conn = Redis(host="127.0.0.1", port="6379", decode_responses=True) # decode_responses is good practice
         q = Queue(connection=redis_conn)  # Use default queue or specify a name
-        from ZZ_redis_module import hello_world  # Import here
         job = q.enqueue_in(timedelta(seconds=10), hello_world) # Use timedelta for clear time intervals
         return jsonify({'message': f'Hello scheduled! Job ID: {job.id}'})
     except Exception as e:
