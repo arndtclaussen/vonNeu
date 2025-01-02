@@ -9,7 +9,19 @@ from views import probes_bp, asteroids_bp, gamestate_bp
 #Loading the rq-dashboard for Admin Purposes
 import rq_dashboard
 
+#Loading rq for scheduling
+from rq import Queue
+import redis
+
+
 load_dotenv()
+
+
+# Create a global Redis connection and RQ queue
+redis_conn = redis.Redis(host=os.getenv('REDIS_HOST'), port=os.getenv('REDIS_PORT'), decode_responses=True)
+q = Queue(connection=redis_conn)  # Use default queue or specify a name like 'low', 'medium', 'high'
+
+
 
 def create_app(config_class=Config):
     """
@@ -26,6 +38,10 @@ def create_app(config_class=Config):
 
     db.init_app(app)
     init_db(app)
+
+    # Make 'q' (RQ queue) accessible to blueprints
+    app.config['RQ_QUEUE'] = q # Store it like this
+
 
     app.register_blueprint(gamestate_bp) 
     app.register_blueprint(probes_bp)
