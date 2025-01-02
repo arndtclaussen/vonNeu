@@ -21,6 +21,12 @@
     <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="advance-time-button">
         Next 5 Seconds
     </button>
+
+    <button class="class=ml-2 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" id="schedule-hello-button">
+        Schedule Hello (10s)
+    </button>
+
+
 </div>
 
 
@@ -31,7 +37,8 @@
 <script>
     const advanceTimeButton = document.getElementById('advance-time-button');
     const actionResultsDiv = document.getElementById('action-results');
-
+    const scheduleHelloButton = document.getElementById('schedule-hello-button');
+   
 
     advanceTimeButton.addEventListener('click', () => {
         fetch('/gamestate/advance_time', {  // New Flask route
@@ -47,6 +54,20 @@
                 actionResultsDiv.innerHTML = '<p>Error updating game time.</p>'; // Display error message
             });
     });
+
+
+    scheduleHelloButton.addEventListener('click', () => {
+        fetch('/gamestate/schedule_hello', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                actionResultsDiv.innerHTML += `&lt;p>${data.message}&lt;/p>`;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                actionResultsDiv.innerHTML += '&lt;p>Error scheduling hello.&lt;/p>';
+            });
+    });
+
 </script>
 
 

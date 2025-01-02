@@ -5,6 +5,10 @@ from datetime import timedelta
 
 from controllers.gamestate import advance_time  # Import your controller function
 
+from rq import Queue
+from redis import Redis
+from datetime import timedelta
+
 
 gamestate_bp = Blueprint('gamestate', __name__, url_prefix='/gamestate', template_folder='../templates/gamestate')
 
@@ -23,6 +27,22 @@ def action():
 @gamestate_bp.route('/advance_time', methods=['POST'])
 def advance_time_route():  # Rename the route handler
     return advance_time()  # Call the controller function
+
+
+
+@gamestate_bp.route('/schedule_hello', methods=['POST'])
+def schedule_hello():
+    try:
+        redis_conn = Redis(host="127.0.0.1", port="6379", decode_responses=True) # decode_responses is good practice
+        q = Queue(connection=redis_conn)  # Use default queue or specify a name
+        from ZZ_redis_module import hello_world  # Import here
+        job = q.enqueue_in(timedelta(seconds=10), hello_world) # Use timedelta for clear time intervals
+        return jsonify({'message': f'Hello scheduled! Job ID: {job.id}'})
+    except Exception as e:
+        print(f"Error scheduling hello: {e}")
+        return jsonify({'error': 'Failed to schedule hello'}), 500
+
+
 
 
 '''
