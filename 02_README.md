@@ -38,6 +38,7 @@ export POSTGRES_USER="myuser"
 export POSTGRES_PASSWORD="mysecretpassword"
 
 
+
 ## Bringin in Tailwind
 npx tailwindcss init
 
@@ -73,10 +74,11 @@ This container is best for local development because you can use RedisInsight to
 redis/redis-stack-server provides Redis Stack but excludes RedisInsight. 
 This container is best for production deployment.
 
-Lets learn somestuff about it:
-* We run it in docker
-* docker exec -it redis-vonneu sh
-* redis-cli
+
+We add in environment:
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+
 
 
 
