@@ -6,6 +6,9 @@ from config import Config
 from models import db, init_db
 from views import probes_bp, asteroids_bp, gamestate_bp
 
+#Loading the rq-dashboard for Admin Purposes
+import rq_dashboard
+
 load_dotenv()
 
 def create_app(config_class=Config):
@@ -14,6 +17,12 @@ def create_app(config_class=Config):
     """
     app = Flask(__name__)
     app.config.from_object(config_class)
+
+    # RQ Dashboard Configuration (Important: before registering blueprints)
+    app.config.from_object(rq_dashboard.default_settings)  # Apply default settings
+    rq_dashboard.web.setup_rq_connection(app) # Connects the dashboard to your Redis instance
+    app.register_blueprint(rq_dashboard.blueprint, url_prefix="/rq")
+
 
     db.init_app(app)
     init_db(app)
