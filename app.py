@@ -1,19 +1,24 @@
 import os
-from flask import Flask
-from dotenv import load_dotenv
-
-from config import Config
-from models import db, init_db
-from views import probes_bp, asteroids_bp, gamestate_bp
-
-#Loading the rq-dashboard for Admin Purposes
-import rq_dashboard
-
-#Loading rq for scheduling
-from rq import Queue
 import redis
 
+from flask import Flask
+from dotenv import load_dotenv
+from rq import Queue
+import rq_dashboard
 
+# Configuration and Models
+from config import Config
+from models import db, init_db
+
+# Blueprints (Views)
+from views import probes_bp, asteroids_bp, gamestate_bp
+
+
+
+# Load environment variables
+load_dotenv()
+
+# Create a global Redis connection and RQ queue *after* loading .env
 load_dotenv()
 
 
