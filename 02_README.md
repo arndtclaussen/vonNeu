@@ -63,6 +63,21 @@ rq worker teste_me -with-scheduler
 There is a dashboard
 
 
+From the webpage we have:
+```
+docker run -d --name redis-stack-server -p 6379:6379 redis/redis-stack-server:latest
+```
+
+Just note: redis/redis-stack contains both Redis Stack server and RedisInsight. 
+This container is best for local development because you can use RedisInsight to visualize your data. 
+redis/redis-stack-server provides Redis Stack but excludes RedisInsight. 
+This container is best for production deployment.
+
+Lets learn somestuff about it:
+* We run it in docker
+* docker exec -it redis-vonneu sh
+* redis-cli
+
 
 
 ## References
