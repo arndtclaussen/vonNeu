@@ -46,6 +46,9 @@ def create_app(config_class=Config):
 
     # Make 'q' (RQ queue) accessible to blueprints
     app.config['RQ_QUEUE'] = q # Store it like this
+    app.config['RQ_CONNECTION'] = redis_conn # Store it like this
+
+
 
 
     app.register_blueprint(gamestate_bp) 

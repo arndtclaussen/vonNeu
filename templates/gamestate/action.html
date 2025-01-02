@@ -22,10 +22,14 @@
         Next 5 Seconds
     </button>
 
-    <button class="class=ml-2 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" id="schedule-hello-button">
+    <button class="class=ml-2 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+        id="schedule-hello-button">
         Schedule Hello (10s)
     </button>
 
+    <button class="ml-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" id="clear-redis-button">
+        Clear Redis
+    </button>
 
 </div>
 
@@ -38,7 +42,8 @@
     const advanceTimeButton = document.getElementById('advance-time-button');
     const actionResultsDiv = document.getElementById('action-results');
     const scheduleHelloButton = document.getElementById('schedule-hello-button');
-   
+    const clearRedisButton = document.getElementById('clear-redis-button');
+
 
     advanceTimeButton.addEventListener('click', () => {
         fetch('/gamestate/advance_time', {  // New Flask route
@@ -65,6 +70,25 @@
             .catch(error => {
                 console.error('Error:', error);
                 actionResultsDiv.innerHTML += '&lt;p>Error scheduling hello.&lt;/p>';
+            });
+    });
+
+
+
+    clearRedisButton.addEventListener('click', () => {
+        fetch('/gamestate/clear_redis', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                // Handle the response from the server
+                if (data.message) {
+                    actionResultsDiv.innerHTML += `<p>${data.message}</p>`;
+                } else if (data.error) {
+                    actionResultsDiv.innerHTML += `<p class="text-red-500">${data.error}</p>`;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                actionResultsDiv.innerHTML += '<p class="text-red-500">An unexpected error occurred.</p>';
             });
     });
 

@@ -6,7 +6,14 @@ from datetime import timedelta
 
 from controllers.gamestate import advance_time, hello_world
 
+import rq  # Make sure to import rq
 
+
+from rq.registry import (
+    FailedJobRegistry,
+    FinishedJobRegistry,
+    ScheduledJobRegistry,
+)
 
 gamestate_bp = Blueprint('gamestate', __name__, url_prefix='/gamestate', template_folder='../templates/gamestate')
 
@@ -38,6 +45,40 @@ def schedule_hello():
         print(f"Error scheduling hello: {e}")
         return jsonify({'error': 'Failed to schedule hello'}), 500
 
+@gamestate_bp.route('/clear_redis', methods=['POST'])
+def clear_redis_route():
+    try:
+        redis_conn = current_app.config['RQ_CONNECTION']
+        queues = rq.Queue.all(connection=redis_conn)
+        queue_names = [q.name for q in queues]
+
+        for queue in queues:
+            queue.empty()
+            failed_registry = FailedJobRegistry(queue=queue, connection=redis_conn)
+            
+            # This is how to remove a job from a registry
+            for job_id in failed_registry.get_job_ids():
+                failed_registry.remove(job_id)
+
+
+            finished_registry = FinishedJobRegistry(queue=queue, connection=redis_conn)
+            # This is how to remove a job from a registry
+            for job_id in finished_registry.get_job_ids():
+                finished_registry.remove(job_id)
+            
+            scheduled_registry = ScheduledJobRegistry(queue=queue, connection=redis_conn)
+            # This is how to remove a job from a registry
+            for job_id in scheduled_registry.get_job_ids():
+                scheduled_registry.remove(job_id)
+            
+            
+            
+
+        return jsonify({'message': 'All queues and registries cleared', 'queues': queue_names}), 200
+
+    except Exception as e:
+        print(f"Error clearing queues: {e}")
+        return jsonify({'error': 'Failed to clear queues'}), 500
 
 
 
