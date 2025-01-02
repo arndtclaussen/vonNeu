@@ -85,3 +85,8 @@ REDIS_PORT=6379
 ## References
 * Library Flask Example, see [here](https://www.digitalocean.com/community/tutorials/how-to-use-a-postgresql-database-in-a-flask-application).
 
+
+
+## Honcho
+Using a Procfile to start different tasks
+* To identify, if still running lsof -i :5005

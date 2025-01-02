@@ -15,3 +15,7 @@ rq
 
 # Lets bring in the rq dashboard
 rq-dashboard
+
+
+#Hocho - to enable the start up easiler using Procfile 
+honcho
