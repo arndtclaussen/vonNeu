@@ -18,9 +18,6 @@ from views import probes_bp, asteroids_bp, gamestate_bp
 # Load environment variables
 load_dotenv()
 
-# Create a global Redis connection and RQ queue *after* loading .env
-load_dotenv()
-
 
 # Create a global Redis connection and RQ queue
 redis_conn = redis.Redis(host=os.getenv('REDIS_HOST'), port=os.getenv('REDIS_PORT'), decode_responses=True)
