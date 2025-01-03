@@ -1,5 +1,5 @@
 # controllers/asteroids.py
-from models import db, Asteroid
+from models import Asteroid
 
 
 

@@ -1,10 +1,9 @@
 # controllers/gamestate.py
 from flask import jsonify
-from models import GameState, db
+from models import GameState, db, Asteroid
 from datetime import timedelta
 
 
-from controllers.asteroids import update_asteroid_positions  # Import from asteroids.py
 
 
 def advance_time():
@@ -19,8 +18,8 @@ def advance_time():
         gamestate.game_time += time_elapsed
        
         # Move Asteroids
-        update_asteroid_positions(time_elapsed_seconds=time_elapsed_seconds)
-        
+        Asteroid.update_positions(time_elapsed_seconds=time_elapsed_seconds)  # Call from Asteroid
+
         
         db.session.commit()
         return jsonify({'new_time': gamestate.game_time.strftime('%Y-%m-%d %H:%M:%S UTC')}), 200 # Explicit 200 OK status
