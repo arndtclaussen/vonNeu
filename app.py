@@ -38,8 +38,12 @@ def create_app(config_class=Config):
     app.register_blueprint(rq_dashboard.blueprint, url_prefix="/rq")
 
 
-    db.init_app(app)
-    init_db(app)
+
+    db.init_app(app)  # Initialize db with the app
+    # Database initialization
+    with app.app_context():  # Use app context for DB operations
+        from models import init_db  # Import inside app context
+        init_db(app)
 
     # Make 'q' (RQ queue) accessible to blueprints
     app.config['RQ_QUEUE'] = q # Store it like this
