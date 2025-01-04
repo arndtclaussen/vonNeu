@@ -1,12 +1,13 @@
 # controllers/gamestate.py
-from flask import jsonify, current_app
-from models import GameState, db, Asteroid
+from flask import jsonify
 from datetime import timedelta
 
 
 
 
 def advance_time():
+    from models import GameState, db, Asteroid
+
     gamestate = GameState.query.first()
     if gamestate:
        
