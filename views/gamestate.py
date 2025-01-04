@@ -34,17 +34,51 @@ def advance_time_route():  # Rename the route handler
     return advance_time()  # Call the controller function
 
 
-
+'''
 @gamestate_bp.route('/schedule_hello', methods=['POST'])
 def schedule_hello():
     try:
         q = current_app.config['RQ_QUEUE'] # Access the app's queue
+        print(f"Config value: {current_app.get('SECRET_KEY')}") # Access config
+      
         job = q.enqueue_in(timedelta(seconds=10), hello_world)
         return jsonify({'message': f'Hello scheduled! Job ID: {job.id}'})
     except Exception as e:
         print(f"Error scheduling hello: {e}")
         return jsonify({'error': 'Failed to schedule hello'}), 500
+'''
 
+''' 2 Versuch
+@gamestate_bp.route('/schedule_hello', methods=['POST'])
+def schedule_hello():
+    try:
+        q = current_app.config['RQ_QUEUE']
+        with current_app.app_context(): # Keep this, create the context
+            print(f"Config value: {current_app.config.get('SECRET_KEY')}") # Access config HERE (inside context)
+            job = q.enqueue_in(timedelta(seconds=10), hello_world) # Pass current_app to the worker
+        return jsonify({'message': f'Hello scheduled! Job ID: {job.id}'})  # This is outside the context, but that's OK for this return
+    except Exception as e:
+        print(f"Error scheduling hello: {e}")
+        return jsonify({'error': 'Failed to schedule hello'}), 500
+'''
+
+@gamestate_bp.route('/schedule_hello', methods=['POST'])
+def schedule_hello():
+    try:
+        my_variable = "this is my variable"
+        q = current_app.config['RQ_QUEUE']  # Accessing current_app here is OK
+        print(current_app.config.get('SECRET_KEY')) # To verify app context
+        job = q.enqueue_in(timedelta(seconds=10), hello_world, my_variable) # No need to pass current_app yet
+
+        return jsonify({'message': f'Hello scheduled! Job ID: {job.id}'})
+    except Exception as e:
+        print(f"Error scheduling hello: {e}")
+        return jsonify({'error': 'Failed to schedule hello'}), 500
+
+        
+
+
+        
 @gamestate_bp.route('/clear_redis', methods=['POST'])
 def clear_redis_route():
     try:

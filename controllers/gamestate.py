@@ -1,5 +1,5 @@
 # controllers/gamestate.py
-from flask import jsonify
+from flask import jsonify, current_app
 from models import GameState, db, Asteroid
 from datetime import timedelta
 
@@ -28,6 +28,15 @@ def advance_time():
     
 
 
-def hello_world():
+def hello_world(passed_variable):
+    print(f"Hello, World! {passed_variable}")
     print("hi")
-    
+
+
+'''
+# In controllers/gamestate.py (or where your worker function is):
+def hello_world(app):
+    with app.app_context():
+        print("Hi from the worker with app context!")
+        #print(f"Config value: {app.config.get('SECRET_KEY')}") # Access config
+'''
