@@ -1,3 +1,6 @@
+
+import rq  # Make sure to import rq
+
 from flask import Blueprint, render_template, jsonify, current_app # Import current_app
 
 from models import GameState
@@ -6,7 +9,7 @@ from datetime import timedelta
 
 from controllers.gamestate import advance_time, hello_world
 
-import rq  # Make sure to import rq
+from tasks.gamestate import hello_world_rq
 
 
 from rq.registry import (
@@ -40,10 +43,9 @@ def schedule_hello():
      
     try:
         my_variable = "this is my variable"
-        q = current_app.config['RQ_QUEUE']  # Accessing current_app here is OK
-        print(current_app.config.get('SECRET_KEY')) # To verify app context
-        job = q.enqueue_in(timedelta(seconds=10), hello_world, my_variable) # No need to pass current_app yet
-
+        q = current_app.config['RQ_QUEUE']  
+       
+        job = q.enqueue_in(timedelta(seconds=10), hello_world_rq, my_variable) # No need to pass current_app yet
         return jsonify({'message': f'Hello scheduled! Job ID: {job.id}'})
     except Exception as e:
         print(f"Error scheduling hello: {e}")
