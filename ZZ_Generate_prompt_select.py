@@ -2,9 +2,20 @@
 import os
 
 def generate_selected_file_prompt(directory, selected_paths, output_file):
+
+
+
     """Generates prompt with structure and content, ignoring __pycache__ and handling files in directories."""
 
     with open(output_file, "w", encoding="utf-8") as f:
+
+        f.write("0) Briefing:\n") # Initial PROPMT
+        f.write("Please behave like a Python / FLask / Reddis / PostgresSQL Expert coming from the gaming development industry:\n") # Initial PROPMT
+        f.write("Please analyze the complete code and summarize it in a few sentences. Then i will ask you specific questions. \n") # Initial PROPMT
+
+
+
+
         f.write("1) Folder Structure:\n")
 
         all_files = [] # List to keep track of all files we need content for
@@ -43,11 +54,11 @@ def generate_selected_file_prompt(directory, selected_paths, output_file):
 if __name__ == "__main__":
     base_directory = "."  # Or specify a different base directory if needed
     selected_items = [
-        os.path.join(".", "app.py"), # Example file
-        os.path.join(".", "models"),  # Example directory
-        os.path.join(".", "controllers"),  # Example directory
-        os.path.join(".", "02_README.md"),  # Example directory
-        os.path.join(".", "03_RQ.md"),  # Example directory
+        os.path.join(".", "app_mvp.py"), # Example file
+        os.path.join(".", "config.py"),  # Example directory
+        os.path.join(".", "templates/index_mvp.html"),  # Example directory
+        os.path.join(".", "Procfile"),  # Example directory
+
         
         
         # ... other files/directories you select

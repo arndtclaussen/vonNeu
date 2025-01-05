@@ -6,3 +6,5 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False # Improves Performance
 
     RQ_DASHBOARD_REDIS_URL = "redis://localhost:6379/0"
+    REDIS_URL = "redis://localhost:6379/0"
+    
