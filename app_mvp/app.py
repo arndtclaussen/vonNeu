@@ -77,20 +77,8 @@ def index():
 def schedule_advance():
     try:
 
-        ### First Test within scheduled function: Show a current_app information
         from interim_def import hello_world, hello_world_rq
-        print(current_app.config.get('SECRET_KEY')) # To verify app context
-        
-        ### Second Test with scheduled function: Run a function (sourced from interim_def.py)
-        my_variable = "this is my variable"
-        out = hello_world(my_variable)
-        print(out)
-
-        ### Third Test within scheduled function: Run the same function over Redis
-        #q = current_app.config['RQ_QUEUE']  # Accessing current_app here is OK
-        #job = q.enqueue_in(timedelta(seconds=10), hello_world, my_variable) # No need to pass current_app to Scheduler anymore
-    
-        ### Fourth Test within scheduled function: Run the same function over Redis
+        my_variable = "Greetings from redis"
         job = q.enqueue_in(timedelta(seconds=10), hello_world_rq, my_variable) # No need to pass current_app to Scheduler anymore
         return jsonify({'message': f'Hello scheduled! Job ID: {job.id}'})
             
