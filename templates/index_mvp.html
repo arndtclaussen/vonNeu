@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MVP Game</title>
+</head>
+<body>
+    <h1>Game Time: <span id="game-time">{{ game_time }}</span></h1>
+
+    <button id="advance-time">Advance Time (+5s)</button>
+    <button id="schedule-advance">Schedule Advance (+5s in 10s)</button>
+
+    <script>
+        const advanceButton = document.getElementById('advance-time');
+        const scheduleButton = document.getElementById('schedule-advance')
+        const gameTimeSpan = document.getElementById('game-time');
+
+        advanceButton.addEventListener('click', () => {
+            fetch('/', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        gameTimeSpan.textContent = data.new_time;
+                    } else {
+                        alert(data.error);  // Handle error
+                    }
+                });
+        });
+
+      scheduleButton.addEventListener('click', () => {
+          fetch('/schedule_advance', { method: 'GET' })
+            .then(resp => resp.json())
+            .then(data => {
+              if (data.message){
+                console.log(data.message)
+              } else {
+                alert(data.error);
+              }
+            })
+        })
+    </script>
+</body>
+</html>
