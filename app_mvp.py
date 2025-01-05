@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 from rq import Queue
 from rq_scheduler import Scheduler
 
-from rq import Queue, get_current_job  # Import get_current_job if using inside job function
+from rq import Queue
 
 
 import rq_dashboard 
@@ -78,7 +78,7 @@ def schedule_advance():
     try:
 
         ### First Test within scheduled function: Show a current_app information
-        from interim_def import hello_world
+        from interim_def import hello_world, hello_world_rq
         print(current_app.config.get('SECRET_KEY')) # To verify app context
         
         ### Second Test with scheduled function: Run a function (sourced from interim_def.py)
@@ -89,8 +89,10 @@ def schedule_advance():
         ### Third Test within scheduled function: Run the same function over Redis
         q = current_app.config['RQ_QUEUE']  # Accessing current_app here is OK
         job = q.enqueue_in(timedelta(seconds=10), hello_world, my_variable) # No need to pass current_app to Scheduler anymore
-        return jsonify({'message': f'Hello scheduled! Job ID: {job.id}'})
-        
+    
+        ### Fourth Test within scheduled function: Run the same function over Redis
+        job2 = q.enqueue_in(timedelta(seconds=10), hello_world_rq, my_variable) # No need to pass current_app to Scheduler anymore
+        return jsonify({'message': f'Hello scheduled! Job ID: {job.id} and {job2.id}'})
             
     except Exception as e:
         print(f"Error scheduling hello: {e}")
