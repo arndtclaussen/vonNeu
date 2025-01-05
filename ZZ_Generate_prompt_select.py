@@ -54,14 +54,15 @@ def generate_selected_file_prompt(directory, selected_paths, output_file):
 if __name__ == "__main__":
     base_directory = "."  # Or specify a different base directory if needed
     selected_items = [
-        os.path.join(".", "app_mvp/app.py"),  # Example directory
-        os.path.join(".", "app_mvp/interim_def.py"),  # Example directory        
-        os.path.join(".", "app_mvp/config.py"),  # Example directory
-        os.path.join(".", "app_mvp/templates/index_mvp.html"),  # Example directory
-        os.path.join(".", "app_mvp/Procfile"),  # Example directory
-       
-
+        os.path.join(".", "app/blueprints/main.py"),  # Example directory
+        os.path.join(".", "app/templates/index_mvp.html"),  # Example directory
+        os.path.join(".", "app/__init__.py"),  # Example directory        
+        os.path.join(".", "app/config.py"),  # Example directory
+        os.path.join(".", "app/extensions.py"),  # Example directory
+        os.path.join(".", "app/models.py"),  # Example directory
+        os.path.join(".", "app/tasks.py"),  # Example directory
         
+               
         
         # ... other files/directories you select
     ]
