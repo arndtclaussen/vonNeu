@@ -85,6 +85,8 @@ REDIS_PORT=6379
 ## References
 * Library Flask Example, see [here](https://www.digitalocean.com/community/tutorials/how-to-use-a-postgresql-database-in-a-flask-application).
 
+## Following:
+https://github.com/yuxiaoy1/microblog/blob/main/app/models.py
 
 
 ## Honcho
