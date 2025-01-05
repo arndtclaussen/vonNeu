@@ -5,7 +5,14 @@ def list_files_recursive(directory, output_file, ignore_list):
        Includes file contents.
     """
 
+
+
     with open(output_file, "w", encoding="utf-8") as f:  # Add encoding for potential special characters
+        f.write("0) Briefing:\n") # Initial PROPMT
+        f.write("Please behave like a Python / FLask / Reddis / PostgresSQL Expert coming from the gaming development industry:\n") # Initial PROPMT
+        f.write("Please analyze the complete code and summarize it in a few sentences. Then i will ask you specific questions. \n") # Initial PROPMT
+
+
         f.write("1) Folder Structure:\n") # Section header
 
         for root, _, files in os.walk(directory):
