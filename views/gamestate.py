@@ -64,6 +64,7 @@ def schedule_hello():
 
 @gamestate_bp.route('/schedule_hello', methods=['POST'])
 def schedule_hello():
+    from 
     try:
         my_variable = "this is my variable"
         q = current_app.config['RQ_QUEUE']  # Accessing current_app here is OK
