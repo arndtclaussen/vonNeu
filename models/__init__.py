@@ -14,7 +14,7 @@ from .gamestate import GameState
 
 def init_db(app):
     with app.app_context():
-        #db.drop_all()  # Remove this unless you REALLY want to reset every time
+        db.drop_all()  # Remove this unless you REALLY want to reset every time
         db.create_all()
 
         # Ensure only one GameState row exists

@@ -27,17 +27,8 @@ def advance_time():
     else:
         return jsonify({'error': 'Game state not found'}), 404
     
-
-
 def hello_world(passed_variable):
     print(f"Hello, World! {passed_variable}")
     print("hi")
 
 
-'''
-# In controllers/gamestate.py (or where your worker function is):
-def hello_world(app):
-    with app.app_context():
-        print("Hi from the worker with app context!")
-        #print(f"Config value: {app.config.get('SECRET_KEY')}") # Access config
-'''
