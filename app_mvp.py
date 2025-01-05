@@ -3,11 +3,14 @@ import redis
 import time
 from datetime import timedelta, datetime
 
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, current_app
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 from rq import Queue
 from rq_scheduler import Scheduler
+
+from rq import Queue, get_current_job  # Import get_current_job if using inside job function
+
 
 import rq_dashboard 
 
@@ -31,6 +34,7 @@ app.register_blueprint(rq_dashboard.blueprint, url_prefix="/rq")
 
 redis_conn = redis.from_url('redis://localhost:6379/0')
 q = Queue(connection=redis_conn)
+scheduler = Scheduler(connection=redis_conn) # Create a scheduler instance
 
 
 
@@ -71,26 +75,24 @@ def index():
 def schedule_advance():
     try:
         my_variable = "this is my variable"
-        stuff = hello_world(my_variable)
-        return jsonify({'message': f'Hello scheduled! Job ID: {stuff}'})
+        out = hello_world(my_variable)
+        return jsonify({'message': f'Hello scheduled! Job ID: {out}'})
 
-        #q = current_app.config['RQ_QUEUE']  # Accessing current_app here is OK
-        #print(current_app.config.get('SECRET_KEY')) # To verify app context
-        #job = q.enqueue_in(timedelta(seconds=10), hello_world, my_variable) # No need to pass current_app yet
 
+        # Schedule using RQ-Scheduler
+        #job = scheduler.enqueue_in(timedelta(seconds=10), hello_world, my_variable)
         #return jsonify({'message': f'Hello scheduled! Job ID: {job.id}'})
+
     except Exception as e:
         print(f"Error scheduling hello: {e}")
         return jsonify({'error': 'Failed to schedule hello'}), 500
 
 
- 
-
 def hello_world(passed_variable):
-    print(f"Hello, World! {passed_variable}")
-    output = "hi"
-    print(output)   
-    return output
+    print(f"Hello, World! {passed_variable}") # This will print on the worker console.
+    #job = get_current_job()  # Get information about the currently executing job
+    return "Hello World Complete!" # Return value, if you need it (not used here).
+
 
 
 def advance_time_rq():
