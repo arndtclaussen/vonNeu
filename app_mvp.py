@@ -30,13 +30,14 @@ rq_dashboard.web.setup_rq_connection(app)
 app.register_blueprint(rq_dashboard.blueprint, url_prefix="/rq")
 
 
-# Redis connection and RQ queue
+# Redis connection and RQ queue (create the queue HERE, not inside a function)
+redis_conn = redis.from_url(app.config['REDIS_URL']) # Use the config for consistency
+q = Queue(connection=redis_conn)  # Create the queue instance globally, tied to the app
+scheduler = Scheduler(queue=q, connection=redis_conn) # Connect scheduler to the queue and redis
 
-redis_conn = redis.from_url('redis://localhost:6379/0')
-q = Queue(connection=redis_conn)
-scheduler = Scheduler(connection=redis_conn) # Create a scheduler instance
-
-
+# Make 'q' (RQ queue) accessible to blueprints
+app.config['RQ_QUEUE'] = q # Store it like this
+app.config['RQ_CONNECTION'] = redis_conn # Store it like this
 
 
 class GameState(db.Model):
@@ -71,43 +72,31 @@ def index():
     return render_template('index_mvp.html', game_time=gamestate.game_time.strftime('%Y-%m-%d %H:%M:%S'))
 
 
+
 @app.route('/schedule_advance')
 def schedule_advance():
     try:
+
+        ### First Test within scheduled function: Show a current_app information
+        from interim_def import hello_world
+        print(current_app.config.get('SECRET_KEY')) # To verify app context
+        
+        ### Second Test with scheduled function: Run a function (sourced from interim_def.py)
         my_variable = "this is my variable"
         out = hello_world(my_variable)
-        return jsonify({'message': f'Hello scheduled! Job ID: {out}'})
+        print(out)
 
-
-        # Schedule using RQ-Scheduler
-        #job = scheduler.enqueue_in(timedelta(seconds=10), hello_world, my_variable)
-        #return jsonify({'message': f'Hello scheduled! Job ID: {job.id}'})
-
+        ### Third Test within scheduled function: Run the same function over Redis
+        q = current_app.config['RQ_QUEUE']  # Accessing current_app here is OK
+        job = q.enqueue_in(timedelta(seconds=10), hello_world, my_variable) # No need to pass current_app to Scheduler anymore
+        return jsonify({'message': f'Hello scheduled! Job ID: {job.id}'})
+        
+            
     except Exception as e:
         print(f"Error scheduling hello: {e}")
         return jsonify({'error': 'Failed to schedule hello'}), 500
 
 
-def hello_world(passed_variable):
-    print(f"Hello, World! {passed_variable}") # This will print on the worker console.
-    #job = get_current_job()  # Get information about the currently executing job
-    return "Hello World Complete!" # Return value, if you need it (not used here).
-
-
-
-def advance_time_rq():
-    with app.app_context():
-        gamestate = GameState.query.first()
-        if gamestate:
-            gamestate.game_time += timedelta(seconds=5)
-            db.session.commit()
-            print(f"Time advanced by RQ Worker to: {gamestate.game_time}")
-            return True
-        return False
-
-
 
 if __name__ == '__main__':
     app.run(debug=True, port=5006)
-
-
