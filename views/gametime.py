@@ -1,12 +1,11 @@
 
 
-import rq  # Make sure to import rq
-
-from flask import Blueprint, render_template, jsonify, current_app # Import current_app
+from flask import Blueprint, jsonify # Import current_app
 
 from models import GameState
-from datetime import timedelta
 
+
+from controllers.gamestate import update_rate
 
 
 gametime_bp = Blueprint('gametime', __name__, url_prefix='/gametime')
@@ -22,3 +21,9 @@ def get_time_info():
         })
     else:
         return jsonify({'error': 'Game state not found'}), 404
+
+
+@gametime_bp.route('/update_rate', methods=['POST'])
+
+def update_rate_route():
+    return update_rate()

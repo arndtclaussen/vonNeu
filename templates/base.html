@@ -9,8 +9,9 @@
 
 <body class="flex h-screen">
     <div class="activity-bar w-24 bg-gray-800 flex flex-col">
-       
-        <a href="{{ url_for('gamestate.overview') }}" class="block py-2 px-4 text-gray-100 hover:bg-gray-700 {% if request.endpoint.startswith('gamestate.') %}bg-gray-900{% endif %}">Time</a>
+
+        <a href="{{ url_for('gamestate.overview') }}"
+            class="block py-2 px-4 text-gray-100 hover:bg-gray-700 {% if request.endpoint.startswith('gamestate.') %}bg-gray-900{% endif %}">Time</a>
 
         <a href="{{ url_for('probes.index') }}"
             class="block py-2 px-4 text-gray-100 hover:bg-gray-700 {% if 'probes' in request.endpoint %}bg-gray-900{% endif %}">Probes</a>
@@ -33,18 +34,22 @@
                 <span id="time-rate">Rate: {{ gamestate.time_rate if gamestate else 1.0 }}x </span>
             </div>
             <div>
-                <button id="play-pause" class="px-2 py-1 bg-green-500 text-white rounded">Play</button>
+                <button id="rate-minus-100" class="px-2 py-1 bg-gray-400 text-white rounded">-100</button>
+                <button id="rate-minus-10" class="px-2 py-1 bg-gray-400 text-white rounded">-10</button>
                 <button id="rate-minus" class="px-2 py-1 bg-gray-400 text-white rounded">-1</button>
+                <button id="play-pause" class="px-2 py-1 bg-green-500 text-white rounded">Play</button>
                 <button id="rate-plus" class="px-2 py-1 bg-gray-400 text-white rounded">+1</button>
+                <button id="rate-plus+10" class="px-2 py-1 bg-gray-400 text-white rounded">+10</button>
+                <button id="rate-plus+100" class="px-2 py-1 bg-gray-400 text-white rounded">+100</button>
             </div>
         </div>
         <div class="game-log mt-4 p-2 bg-white border border-gray-300 rounded overflow-y-auto" style="flex-basis: 25%;">
             <h3>Game Log</h3>
             <div id="game-log-content">
                 {% block game_log %}
-                    <p> "2024-07-27 10:00:00 - Asteroid Found", </p>
-                    <p> "2024-07-27 10:05:00 - Probe Fuel Low", </p>      
-                    <p> "2024-07-27 10:10:00 - Asteroid Scanned: Rich in Iron" </p>    
+                <p> "2024-07-27 10:00:00 - Asteroid Found", </p>
+                <p> "2024-07-27 10:05:00 - Probe Fuel Low", </p>
+                <p> "2024-07-27 10:10:00 - Asteroid Scanned: Rich in Iron" </p>
                 {% endblock %}
             </div>
         </div>
@@ -57,6 +62,14 @@
 
         const gameTimeSpan = document.getElementById('game-time');
         const timeRateSpan = document.getElementById('time-rate');
+        const rateMinusButton100 = document.getElementById('rate-minus-100');
+        const rateMinusButton10 = document.getElementById('rate-minus-10');
+        const rateMinusButton = document.getElementById('rate-minus');
+        const ratePlusButton = document.getElementById('rate-plus');
+        const ratePlusButton10 = document.getElementById('rate-plus+10');
+        const ratePlusButton100 = document.getElementById('rate-plus+100');
+
+
 
         function updateGameTime() {
             fetch('/gametime/get_time_info') // New Flask route to get time info
@@ -79,15 +92,43 @@
         }
 
 
+        function updateRate(change) {
+            fetch('/gametime/update_rate', {  // New route
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ change: change }) // Send the change (+1 or -1)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.new_rate) { // Update rate even if no change to keep UI consistent
+                        timeRateSpan.textContent = "Rate: " + data.new_rate + "x";  // Update the display
+                        console.log("Rate changed:", data.new_rate);
+                    } else {
+                        console.error("Rate change failed:", data); // Handle errors
+                    }
+
+                })
+                .catch(error => {
+                    console.error('Error changing rate:', error); // Catch any network or server errors
+                });
+
+        }
 
 
 
         // Initial update and then every 3 seconds
         updateGameTime();
-        setInterval(updateGameTime, 3000); 
+        setInterval(updateGameTime, 3000);
 
 
-
+        rateMinusButton100.addEventListener('click', () => updateRate(-100));
+        rateMinusButton10.addEventListener('click', () => updateRate(-10));
+        rateMinusButton.addEventListener('click', () => updateRate(-1));
+        ratePlusButton.addEventListener('click', () => updateRate(+1));
+        ratePlusButton10.addEventListener('click', () => updateRate(+10));
+        ratePlusButton100.addEventListener('click', () => updateRate(+100));
 
 
     </script>
