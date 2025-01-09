@@ -27,6 +27,17 @@
         <div class="main-content flex-grow">
             {% block content %}{% endblock %}
         </div>
+        <div class="time-control mt-4 p-2 bg-white border border-gray-300 rounded flex justify-between items-center">
+            <div>
+                <span id="game-time">Game Time: Loading...</span> |
+                <span id="time-rate">Rate: {{ gamestate.time_rate if gamestate else 1.0 }}x </span>
+            </div>
+            <div>
+                <button id="play-pause" class="px-2 py-1 bg-green-500 text-white rounded">Play</button>
+                <button id="rate-minus" class="px-2 py-1 bg-gray-400 text-white rounded">-1</button>
+                <button id="rate-plus" class="px-2 py-1 bg-gray-400 text-white rounded">+1</button>
+            </div>
+        </div>
         <div class="game-log mt-4 p-2 bg-white border border-gray-300 rounded overflow-y-auto" style="flex-basis: 25%;">
             <h3>Game Log</h3>
             <div id="game-log-content">
@@ -42,6 +53,43 @@
 
     <script>
         // JavaScript can be added here if needed
+
+
+        const gameTimeSpan = document.getElementById('game-time');
+        const timeRateSpan = document.getElementById('time-rate');
+
+        function updateGameTime() {
+            fetch('/gametime/get_time_info') // New Flask route to get time info
+                .then(response => response.json())
+                .then(data => {
+                    if (data.game_time && data.time_rate) {
+                        gameTimeSpan.textContent = "Game Time: " + data.game_time;
+                        timeRateSpan.textContent = "Rate: " + data.time_rate + "x";
+                    } else {
+                        console.error("Invalid data received from server:", data);
+                        gameTimeSpan.textContent = "Game Time: Error"; // Indicate an error
+                        timeRateSpan.textContent = "Rate: Error";       // Indicate an error
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching game time:', error);
+                    gameTimeSpan.textContent = "Game Time: Error"; // Display error message
+                    timeRateSpan.textContent = "Rate: Error";       // Display error message
+                });
+        }
+
+
+
+
+
+        // Initial update and then every 3 seconds
+        updateGameTime();
+        setInterval(updateGameTime, 3000); 
+
+
+
+
+
     </script>
 </body>
 

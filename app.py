@@ -11,7 +11,7 @@ from config import Config
 from models import db, init_db
 
 # Blueprints (Views)
-from views import probes_bp, asteroids_bp, gamestate_bp
+from views import probes_bp, asteroids_bp, gamestate_bp, gametime_bp
 
 
 
@@ -55,6 +55,8 @@ def create_app(config_class=Config):
     app.register_blueprint(gamestate_bp) 
     app.register_blueprint(probes_bp)
     app.register_blueprint(asteroids_bp)
+    app.register_blueprint(gametime_bp)
+    
 
     return app
 
@@ -68,5 +70,5 @@ if __name__ == "__main__":
         print("Jinja2 Loader:", app.jinja_loader)
         for template_path in app.jinja_loader.searchpath:
             print("Search Path:", template_path)
-
+    print(app.url_map)
     app.run(debug=True, port=5005)

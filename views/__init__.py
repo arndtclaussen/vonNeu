@@ -4,5 +4,6 @@ from flask import Blueprint
 from .gamestate import gamestate_bp
 from .probes import probes_bp
 from .asteroids import asteroids_bp
+from .gametime import gametime_bp
 
 

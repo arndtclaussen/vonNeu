@@ -7,7 +7,7 @@ from models import GameState
 from datetime import timedelta
 
 
-from controllers.gamestate import advance_time, hello_world
+from controllers.gamestate import advance_time
 
 from tasks.gamestate import hello_world_rq
 
@@ -89,6 +89,4 @@ def clear_redis_route():
     except Exception as e:
         print(f"Error clearing queues: {e}")
         return jsonify({'error': 'Failed to clear queues'}), 500
-
-
 
