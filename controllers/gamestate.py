@@ -35,6 +35,8 @@ def hello_world(passed_variable):
 def update_rate():
     from flask import jsonify, request
     from models import GameState, db
+    from controllers.game_log import add_log_entry # Import add_log_entry
+
 
     try:
         change = int(request.json.get('change', 0))  # Get change from request body. Default to 0.
@@ -45,7 +47,8 @@ def update_rate():
             if new_rate != gamestate.time_rate: # Only update if there's a change
               gamestate.time_rate = new_rate
               db.session.commit()
-              print(f"New time rate: {gamestate.time_rate}")
+              add_log_entry(f"Time rate changed to {new_rate}x") # Add log entry
+              print(f"New time rate: {gamestate.time_rate}")  # Keep for debugging
             return jsonify({'new_rate': gamestate.time_rate}), 200 
         else:
             return jsonify({'error': 'Game state not found'}), 404

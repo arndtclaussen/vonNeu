@@ -1,11 +1,15 @@
-from models import db, GameLog
+from models import db, GameLog, GameState
 
 def add_log_entry(message):
     try:
-        log_entry = GameLog(message=message)
-        db.session.add(log_entry)
-        db.session.commit()
-        print(f"Log entry added: {message}")
+        gamestate = GameState.query.first()
+        if gamestate:
+            log_entry = GameLog(message=message, timestamp=gamestate.game_time)  # Set timestamp here
+            db.session.add(log_entry)
+            db.session.commit()
+            print(f"Log entry added: {message} at {gamestate.game_time}") # Log includes gametime
+        else:
+            print("Error: GameState not found. Log entry not created.")
     except Exception as e:
         db.session.rollback()
         print(f"Error adding log entry: {e}")
