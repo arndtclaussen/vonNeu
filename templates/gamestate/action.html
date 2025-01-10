@@ -18,9 +18,6 @@
 <h1>Game State Actions</h1>
 
 <div>
-    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="advance-time-button">
-        Next 5 Seconds
-    </button>
 
     <button class="class=ml-2 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
         id="schedule-hello-button">
@@ -39,26 +36,11 @@
 
 
 <script>
-    const advanceTimeButton = document.getElementById('advance-time-button');
+    
     const actionResultsDiv = document.getElementById('action-results');
     const scheduleHelloButton = document.getElementById('schedule-hello-button');
     const clearRedisButton = document.getElementById('clear-redis-button');
 
-
-    advanceTimeButton.addEventListener('click', () => {
-        fetch('/gamestate/advance_time', {  // New Flask route
-            method: 'POST', // Use POST if you're modifying data on the server
-        })
-            .then(response => response.json())
-            .then(data => {
-                // Update the page based on the server's response
-                actionResultsDiv.innerHTML = `<p>New Game Time: ${data.new_time}</p>`; // Example
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                actionResultsDiv.innerHTML = '<p>Error updating game time.</p>'; // Display error message
-            });
-    });
 
 
     scheduleHelloButton.addEventListener('click', () => {

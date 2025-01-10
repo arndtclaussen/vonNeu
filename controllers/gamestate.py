@@ -12,7 +12,7 @@ def advance_time():
     if gamestate:
        
         # Figure out time
-        time_elapsed = timedelta(seconds=5)  # Get the time step
+        time_elapsed = timedelta(seconds=gamestate.time_rate)  # Get the time step
         time_elapsed_seconds = time_elapsed.total_seconds() 
         
         # Store in db
