@@ -8,7 +8,7 @@ from rq import Queue
 from redis import Redis
 from datetime import timedelta
 
-redis_conn = Redis(host="127.0.0.1", port="6379", decode_responses=True)
+redis_conn = Redis(host=Config.REDIS_HOST_4_SCHEDULE, port=Config.REDIS_PORT_4_SCHEDULE, decode_responses=True)
 q = Queue(connection=redis_conn) # Declare it outside
 
 
@@ -24,7 +24,7 @@ def hello_world_rq(my_variable):
         inspector = inspect(engine) # Create an inspector
         tables = inspector.get_table_names() # Get table names
         print(f"Existing tables: {tables}")
-        q.enqueue_in(timedelta(seconds=10), hello_world_rq, my_variable)
+        q.enqueue_in(timedelta(seconds=Config.REDIS_TIME_SCHEDULE), hello_world_rq, my_variable)
 
     except Exception as e:
         session.rollback()

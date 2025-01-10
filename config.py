@@ -8,3 +8,6 @@ class Config:
     RQ_DASHBOARD_REDIS_URL = "redis://localhost:6379/0"
     REDIS_URL = "redis://localhost:6379/0"
     
+    REDIS_HOST_4_SCHEDULE = "127.0.0.1"
+    REDIS_PORT_4_SCHEDULE = "6379"
+    REDIS_TIME_SCHEDULE = 10

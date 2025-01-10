@@ -11,6 +11,8 @@ from controllers.gamestate import advance_time
 
 from tasks.gamestate import hello_world_rq
 
+from config import Config  # Import your config
+
 
 from rq.registry import (
     FailedJobRegistry,
@@ -48,7 +50,7 @@ def schedule_hello():
         my_variable = "this is my variable"
         q = current_app.config['RQ_QUEUE']  
        
-        job = q.enqueue_in(timedelta(seconds=10), hello_world_rq, my_variable) # No need to pass current_app yet
+        job = q.enqueue_in(timedelta(seconds=Config.REDIS_TIME_SCHEDULE), hello_world_rq, my_variable) # No need to pass current_app yet
         return jsonify({'message': f'Hello scheduled! Job ID: {job.id}'})
     except Exception as e:
         print(f"Error scheduling hello: {e}")
