@@ -24,7 +24,6 @@ redis_conn = redis.Redis(host=os.getenv('REDIS_HOST'), port=os.getenv('REDIS_POR
 q = Queue(connection=redis_conn)  # Use default queue or specify a name like 'low', 'medium', 'high'
 
 
-
 def create_app(config_class=Config):
     """
     Application factory function to create and configure the Flask app.
@@ -57,7 +56,6 @@ def create_app(config_class=Config):
     app.register_blueprint(asteroids_bp)
     app.register_blueprint(gametime_bp)
     
-
     return app
 
 

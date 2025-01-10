@@ -53,3 +53,20 @@ def update_rate():
         db.session.rollback()
         print("Error updating rate:", e)
         return jsonify({'error': str(e)}), 500
+
+def reset_rate():
+    from flask import jsonify, request
+    from models import GameState, db
+    
+    try:
+        gamestate = GameState.query.first()
+        if gamestate:
+            gamestate.time_rate = 1.0  # Reset to 1
+            db.session.commit()
+            return jsonify({'new_rate': gamestate.time_rate}), 200
+        else:
+            return jsonify({'error': 'Game state not found'}), 404
+    except Exception as e:
+        db.session.rollback()
+        print("Error resetting rate:", e)
+        return jsonify({'error': str(e)}), 500

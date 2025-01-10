@@ -5,7 +5,8 @@ from flask import Blueprint, jsonify # Import current_app
 from models import GameState
 
 
-from controllers.gamestate import update_rate
+from controllers.gamestate import update_rate, reset_rate
+
 
 
 gametime_bp = Blueprint('gametime', __name__, url_prefix='/gametime')
@@ -27,3 +28,9 @@ def get_time_info():
 
 def update_rate_route():
     return update_rate()
+
+
+@gametime_bp.route('/reset_rate', methods=['POST'])
+def reset_rate_route():
+    return reset_rate()
+
