@@ -9,7 +9,7 @@ db = SQLAlchemy()
 from .probe import Probe
 from .asteroid import Asteroid
 from .gamestate import GameState
-
+from .game_log import GameLog
 
 
 def init_db(app):
@@ -62,4 +62,17 @@ def init_db(app):
 
                 asteroid = Asteroid(**data)
                 db.session.add(asteroid)
+
+        # Adding example Game Logs:
+        if GameLog.query.count() == 0:
+            now = datetime.now(timezone.utc)
+            game_logs_data = [
+                {"timestamp": now - timedelta(minutes=5), "message": "Probe Mk1 launched from Earth."},
+                {"timestamp": now - timedelta(minutes=2), "message": "Asteroid Alpha detected near Mars."},
+                {"timestamp": now, "message": "Probe Mk2 low on fuel."},  # Current time log
+            ]
+            for data in game_logs_data:
+                log_entry = GameLog(**data)
+                db.session.add(log_entry)
+        
         db.session.commit()

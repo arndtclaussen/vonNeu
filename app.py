@@ -1,7 +1,7 @@
 import os
 import redis
 
-from flask import Flask
+from flask import Flask, redirect, url_for
 from dotenv import load_dotenv
 from rq import Queue
 import rq_dashboard
@@ -11,7 +11,7 @@ from config import Config
 from models import db, init_db
 
 # Blueprints (Views)
-from views import probes_bp, asteroids_bp, gamestate_bp, gametime_bp
+from views import probes_bp, asteroids_bp, gamestate_bp, gametime_bp, general_bp
 
 
 
@@ -50,14 +50,13 @@ def create_app(config_class=Config):
 
 
 
-
     app.register_blueprint(gamestate_bp) 
     app.register_blueprint(probes_bp)
     app.register_blueprint(asteroids_bp)
     app.register_blueprint(gametime_bp)
-    
-    return app
+    app.register_blueprint(general_bp) 
 
+    return app
 
 
 if __name__ == "__main__":
