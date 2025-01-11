@@ -1,0 +1,16 @@
+<!-- templates/space/asteroids.html -->
+{% extends 'base.html' %}
+
+{% block title %}Asteroids{% endblock %}
+
+{% block sidebar %}
+<ul>
+    <li><a href="{{ url_for('space.asteroids') }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300 {% if request.endpoint.startswith('space.asteroids') %}bg-gray-400{% endif %}">Asteroids</a></li>
+    <li><a href="{{ url_for('space.objects') }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300 {% if request.endpoint.startswith('space.objects') %}bg-gray-400{% endif %}">Objects</a></li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<h1>Space Asteroids</h1>  
+</div>
+{% endblock %}
