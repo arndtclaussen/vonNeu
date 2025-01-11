@@ -13,19 +13,19 @@
 {% block content %}
 <h1>Space Asteroids</h1>
 
-<div id="asteroids-table" class="mt-4">
+<div class="overflow-x-auto max-w-screen-xl mt-4">
     <table class="table-auto w-full">
         <thead>
-            <tr>
-                <th class="px-4 py-2">Name</th>
-                <th class="px-4 py-2">Composition</th>
-                <th class="px-4 py-2">Size</th>
-                <th class="px-4 py-2">Discovered At</th>
-                <th class="px-4 py-2">X-Coordinate</th>
-                <th class="px-4 py-2">Y-Coordinate</th>
+            <tr class="bg-gray-200 text-gray-800 font-semibold">
+                <th class="px-4 py-2 border-b border-gray-300">Name</th>
+                <th class="px-4 py-2 border-b border-gray-300">Composition</th>
+                <th class="px-4 py-2 border-b border-gray-300">Size</th>
+                <th class="px-4 py-2 border-b border-gray-300">Discovered At</th>
+                <th class="px-4 py-2 border-b border-gray-300">X-Coordinate</th>
+                <th class="px-4 py-2 border-b border-gray-300">Y-Coordinate</th>
             </tr>
         </thead>
-        <tbody id="asteroids-table-body">
+        <tbody id="asteroids-table-body" class="text-gray-700">
             <!-- Asteroid data will be inserted here -->
         </tbody>
     </table>
@@ -34,26 +34,56 @@
 
 <script>
     function updateAsteroidTable() {
-        fetch('/space/get_asteroids') // New route to fetch asteroid data
+        fetch('/space/get_asteroids')
             .then(response => response.json())
             .then(asteroids => {
                 const tableBody = document.getElementById('asteroids-table-body');
                 tableBody.innerHTML = ''; // Clear existing rows
 
-                asteroids.forEach(asteroid => {
+                asteroids.forEach((asteroid, index) => {
                     const row = tableBody.insertRow();
-                    row.insertCell().textContent = asteroid.name;
-                    row.insertCell().textContent = asteroid.composition;
-                    row.insertCell().textContent = asteroid.size;
-                    row.insertCell().textContent = asteroid.discovered_at;
-                    row.insertCell().textContent = asteroid.x_coordinate.toFixed(2); // Format coordinates
-                    row.insertCell().textContent = asteroid.y_coordinate.toFixed(2);
+                    row.classList.add(
+                        index % 2 === 0 ? 'bg-white' : 'bg-gray-50', 
+                        'hover:bg-gray-100',
+                        'border-b', 
+                        'border-gray-200'
+                    );
+
+                    // Name
+                    const nameCell = row.insertCell();
+                    nameCell.textContent = asteroid.name;
+                    nameCell.classList.add('px-4', 'py-2');
+
+                    // Composition
+                    const compCell = row.insertCell();
+                    compCell.textContent = asteroid.composition;
+                    compCell.classList.add('px-4', 'py-2');
+
+                    // Size
+                    const sizeCell = row.insertCell();
+                    sizeCell.textContent = asteroid.size;
+                    sizeCell.classList.add('px-4', 'py-2', 'text-right');
+
+                    // Discovered At
+                    const discoveredCell = row.insertCell();
+                    discoveredCell.textContent = asteroid.discovered_at || 'N/A'; // Handle null
+                    discoveredCell.classList.add('px-4', 'py-2');
+
+                    // X-coordinate
+                    const xCoordCell = row.insertCell();
+                    xCoordCell.textContent = asteroid.x_coordinate.toFixed(2);
+                    xCoordCell.classList.add('px-4', 'py-2', 'text-right');
+
+                    // Y-coordinate
+                    const yCoordCell = row.insertCell();
+                    yCoordCell.textContent = asteroid.y_coordinate.toFixed(2);
+                    yCoordCell.classList.add('px-4', 'py-2', 'text-right');
                 });
             })
             .catch(error => console.error('Error fetching asteroids:', error));
     }
 
     updateAsteroidTable();
-    setInterval(updateAsteroidTable, 5000); // Update every 5 seconds
+    setInterval(updateAsteroidTable, 5000); 
 </script>
 {% endblock %}
