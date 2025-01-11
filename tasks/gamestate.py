@@ -46,6 +46,7 @@ def update_game_state():
             for asteroid in asteroids:
                 asteroid.x_coordinate += asteroid.delta_v_x * time_elapsed.total_seconds()
                 asteroid.y_coordinate += asteroid.delta_v_y * time_elapsed.total_seconds()
+                session.commit() # Commit game time update first
                 
             print(f"Game state updated at {gamestate.game_time}, rate: {gamestate.time_rate}")
 
