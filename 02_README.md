@@ -28,7 +28,7 @@ docker run --name game-vonneu -e POSTGRES_PASSWORD=mysecretpassword -e POSTGRES_
 
 
 
-## Setup Flask
+## Setup Flask (in environment)
 export FLASK_APP=app
 export FLASK_ENV=development
 

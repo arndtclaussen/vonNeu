@@ -1,16 +1,10 @@
 # controllers/gamestate.py
-from flask import jsonify
-from datetime import timedelta
-
-
+from flask import jsonify, request
+from models import GameState, db
+from controllers.game_log import add_log_entry # Import add_log_entry
 
 
 def update_rate():
-    from flask import jsonify, request
-    from models import GameState, db
-    from controllers.game_log import add_log_entry # Import add_log_entry
-
-
     try:
         change = int(request.json.get('change', 0))  # Get change from request body. Default to 0.
         gamestate = GameState.query.first()

@@ -56,10 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     }
 
-    rateMinusButton1000.addEventListener('click', () => updateRate(-1000));
-    rateMinusButton100.addEventListener('click', () => updateRate(-100));
-    rateMinusButton10.addEventListener('click', () => updateRate(-10));
-    rateMinusButton.addEventListener('click', () => updateRate(-1));
+    
     ratePlusButton.addEventListener('click', () => updateRate(+1));
     ratePlusButton10.addEventListener('click', () => updateRate(+10));
     ratePlusButton100.addEventListener('click', () => updateRate(+100));

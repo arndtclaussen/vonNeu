@@ -10,8 +10,6 @@ from datetime import timedelta
 
 
 from models import db, GameState, Asteroid  # Import necessary models
-from controllers.asteroids import update_asteroid_positions # Import update function
-
 
 
 
