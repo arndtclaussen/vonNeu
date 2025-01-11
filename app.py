@@ -11,7 +11,7 @@ from config import Config
 from models import db, init_db
 
 # Blueprints (Views)
-from views import probes_bp, gamestate_bp, gametime_bp, general_bp, space_bp
+from views import gamestate_bp, gametime_bp, general_bp, space_bp, assets_bp
 
 
 
@@ -51,10 +51,11 @@ def create_app(config_class=Config):
 
 
     app.register_blueprint(gamestate_bp) 
-    app.register_blueprint(probes_bp)
     app.register_blueprint(gametime_bp)
-    app.register_blueprint(general_bp)     
-    app.register_blueprint(space_bp) 
+    app.register_blueprint(general_bp)   
+
+    app.register_blueprint(space_bp)
+    app.register_blueprint(assets_bp) 
 
     return app
 
