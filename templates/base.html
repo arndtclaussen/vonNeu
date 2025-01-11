@@ -34,7 +34,8 @@
                 <span id="time-rate">Rate: {{(gamestate.time_rate if gamestate else 1.0)}} </span>
             </div>
             <div>
-                <button id="advance-time-button-2" class="px-2 py-1 bg-green-500 text-white rounded">Advance</button>
+                <button id="start-game-cyclce" class="px-2 py-1 bg-green-500 text-white rounded">Start</button>
+                <button id="stop-game-cyclce" class="px-2 py-1 bg-green-500 text-white rounded">Stop</button>
 
                 <button id="rate-minus-1000" class="px-2 py-1 bg-gray-400 text-white rounded">-1000</button>
                 <button id="rate-minus-100" class="px-2 py-1 bg-gray-400 text-white rounded">-100</button>
@@ -72,10 +73,11 @@
         
 
 
-        const advanceTimeButton2 = document.getElementById('advance-time-button-2');
+        const startGameCyclceButton = document.getElementById('start-game-cyclce');
+        const stopGameCyclceButton = document.getElementById('stop-game-cyclce');
 
 
-        advanceTimeButton2.addEventListener('click', () => {
+        startGameCyclceButton.addEventListener('click', () => {
 
             fetch('/gametime/advance_time', {
                 method: 'POST'

@@ -66,8 +66,11 @@ def update_game_state():
             session.commit() # Commit game time update first
 
             # 2. Update Asteroid Positions
-            #update_asteroid_positions(time_elapsed_seconds=time_elapsed.total_seconds())
-
+            asteroids = session.query(Asteroid).all()  # Use session, not db
+            for asteroid in asteroids:
+                asteroid.x_coordinate += asteroid.delta_v_x * time_elapsed.total_seconds()
+                asteroid.y_coordinate += asteroid.delta_v_y * time_elapsed.total_seconds()
+                
             print(f"Game state updated at {gamestate.game_time}, rate: {gamestate.time_rate}")
 
         else:
