@@ -6,17 +6,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const rateResetButton = document.getElementById('rate-reset'); 
 
 
-    const rateMinusButton1000 = document.getElementById('rate-minus-1000');
-    const rateMinusButton100 = document.getElementById('rate-minus-100');
-    const rateMinusButton10 = document.getElementById('rate-minus-10');
-    const rateMinusButton = document.getElementById('rate-minus');
     const ratePlusButton = document.getElementById('rate-plus');
     const ratePlusButton10 = document.getElementById('rate-plus+10');
     const ratePlusButton100 = document.getElementById('rate-plus+100');
     const ratePlusButton1000 = document.getElementById('rate-plus+1000');
-
-
-
 
 
     function updateRate(change) {

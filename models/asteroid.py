@@ -12,19 +12,7 @@ class Asteroid(db.Model):
     delta_v_y = db.Column(db.Float)           # delta v of y
 
 
-    @classmethod
-    def update_positions(cls, time_elapsed_seconds):
-        try:
-            asteroids = cls.query.all()  # Use cls.query to access the database
-            for asteroid in asteroids:
-                asteroid.x_coordinate += asteroid.delta_v_x * time_elapsed_seconds
-                asteroid.y_coordinate += asteroid.delta_v_y * time_elapsed_seconds
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            print(f"An error occurred during position update: {e}")
-
-
+   
     def to_dict(self):  # Add this
         return {
             'id': self.id,
