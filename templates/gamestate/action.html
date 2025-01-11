@@ -19,61 +19,15 @@
 
 <div>
 
-    <button class="class=ml-2 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-        id="schedule-hello-button">
-        Schedule Hello (10s)
-    </button>
-
-    <button class="ml-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" id="clear-redis-button">
-        Clear Redis
-    </button>
-
+    hu 
 </div>
 
 
-<div id="action-results" class="mt-4">
-</div>
 
 
 <script>
     
-    const actionResultsDiv = document.getElementById('action-results');
-    const scheduleHelloButton = document.getElementById('schedule-hello-button');
-    const clearRedisButton = document.getElementById('clear-redis-button');
-
-
-
-    scheduleHelloButton.addEventListener('click', () => {
-        fetch('/gamestate/schedule_hello', { method: 'POST' })
-            .then(response => response.json())
-            .then(data => {
-                actionResultsDiv.innerHTML += `&lt;p>${data.message}&lt;/p>`;
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                actionResultsDiv.innerHTML += '&lt;p>Error scheduling hello.&lt;/p>';
-            });
-    });
-
-
-
-    clearRedisButton.addEventListener('click', () => {
-        fetch('/gamestate/clear_redis', { method: 'POST' })
-            .then(response => response.json())
-            .then(data => {
-                // Handle the response from the server
-                if (data.message) {
-                    actionResultsDiv.innerHTML += `<p>${data.message}</p>`;
-                } else if (data.error) {
-                    actionResultsDiv.innerHTML += `<p class="text-red-500">${data.error}</p>`;
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                actionResultsDiv.innerHTML += '<p class="text-red-500">An unexpected error occurred.</p>';
-            });
-    });
-
+    
 </script>
 
 

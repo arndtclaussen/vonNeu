@@ -1,11 +1,8 @@
-
-
 from flask import Blueprint, jsonify # Import current_app
-
 from models import GameState
 
 
-from controllers.gamestate import update_rate, reset_rate, advance_time
+from controllers.gamestate import update_rate, reset_rate
 
 
 
@@ -35,6 +32,3 @@ def reset_rate_route():
     return reset_rate()
 
 
-@gametime_bp.route('/advance_time', methods=['POST'])  # Renamed route
-def advance_time_route():
-    return advance_time()

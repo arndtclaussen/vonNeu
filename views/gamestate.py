@@ -7,9 +7,7 @@ from models import GameState
 from datetime import timedelta
 
 
-from controllers.gamestate import advance_time
-
-from tasks.gamestate import hello_world_rq, update_game_state
+from tasks.gamestate import update_game_state
 
 from config import Config  # Import your config
 
@@ -36,23 +34,12 @@ def action():
     return render_template('gamestate/action.html')
 
 
-
-@gamestate_bp.route('/advance_time', methods=['POST'])
-def advance_time_route():  # Rename the route handler
-    return advance_time()  # Call the controller function
-
-
-
-@gamestate_bp.route('/schedule_hello', methods=['POST'])
-def schedule_hello():
+@gamestate_bp.route('/start_game_cyclce', methods=['POST'])
+def start_game_cyclce():
      
     try:
-        my_variable = "this is my variable"
         q = current_app.config['RQ_QUEUE']  
-       
-        #job = q.enqueue_in(timedelta(seconds=Config.REDIS_TIME_SCHEDULE), hello_world_rq, my_variable) # No need to pass current_app yet
         job = q.enqueue_in(timedelta(seconds=Config.REDIS_TIME_SCHEDULE), update_game_state) # No need to pass current_app yet
-        
         return jsonify({'message': f'Hello scheduled! Job ID: {job.id}'})
     except Exception as e:
         print(f"Error scheduling hello: {e}")

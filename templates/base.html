@@ -35,7 +35,7 @@
             </div>
             <div>
                 <button id="start-game-cyclce" class="px-2 py-1 bg-green-500 text-white rounded">Start</button>
-                <button id="stop-game-cyclce" class="px-2 py-1 bg-green-500 text-white rounded">Stop</button>
+                <button id="stop-game-cyclce" class="px-2 py-1 bg-red-500 text-white rounded">Stop</button>
 
                 <button id="rate-minus-1000" class="px-2 py-1 bg-gray-400 text-white rounded">-1000</button>
                 <button id="rate-minus-100" class="px-2 py-1 bg-gray-400 text-white rounded">-100</button>
@@ -70,7 +70,7 @@
         // JavaScript can be added here if needed
 
 
-        
+
 
 
         const startGameCyclceButton = document.getElementById('start-game-cyclce');
@@ -78,15 +78,21 @@
 
 
         startGameCyclceButton.addEventListener('click', () => {
-
-            fetch('/gametime/advance_time', {
-                method: 'POST'
-            })
+            fetch('/gamestate/start_game_cyclce', { method: 'POST' })
                 .then(response => response.json())
-                .then(data => {
-                    document.getElementById('results').textContent = 'new Time: ' + data.new_time;
-                });
+                .catch(error => {
+                    console.error('Error:', error);
 
+                });
+        });
+
+
+        stopGameCyclceButton.addEventListener('click', () => {
+            fetch('/gamestate/clear_redis', { method: 'POST' })
+                .then(response => response.json())
+                .catch(error => {
+                    console.error('Error:', error);
+                });
         });
 
 
