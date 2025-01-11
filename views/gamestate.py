@@ -18,7 +18,7 @@ from rq.registry import (
     ScheduledJobRegistry,
 )
 
-from controllers.game_log import GameLog, get_last_10_logs
+from controllers.game_log import get_last_10_logs, add_log_entry # Import add_log_entry
 
 
 gamestate_bp = Blueprint('gamestate', __name__, url_prefix='/gamestate', template_folder='../templates/gamestate')
@@ -40,6 +40,8 @@ def start_game_cyclce():
     try:
         q = current_app.config['RQ_QUEUE']  
         job = q.enqueue_in(timedelta(seconds=Config.REDIS_TIME_SCHEDULE), update_game_state) # No need to pass current_app yet
+        add_log_entry(f"In Game Started") # Add log entry
+
         return jsonify({'message': f'Hello scheduled! Job ID: {job.id}'})
     except Exception as e:
         print(f"Error scheduling hello: {e}")
@@ -74,7 +76,8 @@ def clear_redis_route():
             # This is how to remove a job from a registry
             for job_id in scheduled_registry.get_job_ids():
                 scheduled_registry.remove(job_id)
-            
+        add_log_entry(f"In Game Stopped") # Add log entry
+    
             
             
 

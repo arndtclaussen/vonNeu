@@ -23,6 +23,8 @@
                 <th class="px-4 py-2 border-b border-gray-300">Discovered At</th>
                 <th class="px-4 py-2 border-b border-gray-300">X-Coordinate</th>
                 <th class="px-4 py-2 border-b border-gray-300">Y-Coordinate</th>
+                <th class="px-4 py-2 border-b border-gray-300">X-delta_v_x</th>
+                <th class="px-4 py-2 border-b border-gray-300">Y-delta_v_y</th>
             </tr>
         </thead>
         <tbody id="asteroids-table-body" class="text-gray-700">
@@ -78,6 +80,16 @@
                     const yCoordCell = row.insertCell();
                     yCoordCell.textContent = asteroid.y_coordinate.toFixed(2);
                     yCoordCell.classList.add('px-4', 'py-2', 'text-right');
+                    
+                    // delta-X-V
+                    const deltaxvCell = row.insertCell();
+                    deltaxvCell.textContent = asteroid.delta_v_x.toFixed(2);
+                    deltaxvCell.classList.add('px-4', 'py-2', 'text-right');
+
+                    // delta-X-V
+                    const deltayvCell = row.insertCell();
+                    deltayvCell.textContent = asteroid.delta_v_y.toFixed(2);
+                    deltayvCell.classList.add('px-4', 'py-2', 'text-right');
                 });
             })
             .catch(error => console.error('Error fetching asteroids:', error));
