@@ -9,4 +9,4 @@ general_bp = Blueprint('general', __name__)
 def index():
     gamestate = GameState.query.first() # Fetch GameState here, and pass it
     if gamestate:
-        return redirect(url_for('gamestate.overview'))
+        return redirect(url_for('assets.probes'))

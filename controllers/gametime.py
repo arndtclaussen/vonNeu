@@ -1,4 +1,4 @@
-# controllers/gamestate.py
+# controllers/gametime.py
 from flask import jsonify, request
 from models import GameState, db
 from controllers.game_log import add_log_entry # Import add_log_entry
