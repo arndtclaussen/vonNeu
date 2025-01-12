@@ -1,6 +1,7 @@
 
 from models import db, GameLog, GameState
 
+
 def add_log_entry(message):
     try:
         gamestate = GameState.query.first()

@@ -1,5 +1,5 @@
 export function updateGameLog() {
-    fetch('/gamestate/get_logs')
+    fetch('/gamelog/get_logs')
         .then(response => response.json())
         .then(logs => {
             const gameLogList = document.getElementById('game-log-list');

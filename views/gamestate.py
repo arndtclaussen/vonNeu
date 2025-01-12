@@ -1,14 +1,9 @@
-
 import rq  # Make sure to import rq
-
 from flask import Blueprint, render_template, jsonify, current_app # Import current_app
-
 from models import GameState
 from datetime import timedelta
 
-
 from tasks.gamestate import update_game_state
-
 from config import Config  # Import your config
 
 
@@ -18,7 +13,7 @@ from rq.registry import (
     ScheduledJobRegistry,
 )
 
-from controllers.game_log import get_last_10_logs, add_log_entry # Import add_log_entry
+from controllers.game_log import add_log_entry # Import add_log_entry
 
 
 gamestate_bp = Blueprint('gamestate', __name__, url_prefix='/gamestate', template_folder='../templates/gamestate')
@@ -79,11 +74,3 @@ def clear_redis_route():
         print(f"Error clearing queues: {e}")
         return jsonify({'error': 'Failed to clear queues'}), 500
 
-
-
-@gamestate_bp.route('/get_logs')
-def get_logs():
-    logs = get_last_10_logs()
-    # Convert log objects to dictionaries for JSON serialization
-    log_list = [{'timestamp': log.timestamp.strftime('%Y-%m-%d %H:%M:%S UTC'), 'message': log.message} for log in logs]
-    return jsonify(log_list)

@@ -8,7 +8,7 @@ def asteroids():
     return render_template('space/asteroids.html')
 
 
-@space_bp.route('/object') # Route is /gamestate/action
+@space_bp.route('/object') 
 def objects():
     return render_template('space/objects.html')
 
