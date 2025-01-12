@@ -1,3 +1,4 @@
+
 from models import db, GameLog, GameState
 
 def add_log_entry(message):
@@ -14,7 +15,6 @@ def add_log_entry(message):
         db.session.rollback()
         print(f"Error adding log entry: {e}")
 
-# controllers/game_log.py
 def get_last_10_logs():
     try:
         logs = GameLog.query.order_by(GameLog.timestamp.desc()).limit(10).all()

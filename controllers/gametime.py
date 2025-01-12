@@ -1,7 +1,7 @@
 # controllers/gametime.py
 from flask import jsonify, request
 from models import GameState, db
-from controllers.game_log import add_log_entry # Import add_log_entry
+from controllers.game_log import add_log_entry 
 
 
 def update_rate():
@@ -25,13 +25,11 @@ def update_rate():
         return jsonify({'error': str(e)}), 500
 
 def reset_rate():
-    from flask import jsonify, request
-    from models import GameState, db
-    
+ 
     try:
         gamestate = GameState.query.first()
         if gamestate:
-            gamestate.time_rate = 1.0  # Reset to 1
+            gamestate.time_rate = 1.0  
             db.session.commit()
             return jsonify({'new_rate': gamestate.time_rate}), 200
         else:
