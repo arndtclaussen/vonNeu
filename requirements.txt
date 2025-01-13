@@ -16,6 +16,7 @@ rq
 # Lets bring in the rq dashboard
 rq-dashboard
 
+flask-socketio
 
 #Hocho - to enable the start up easiler using Procfile 
 honcho
