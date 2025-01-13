@@ -54,7 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
     ratePlusButton10.addEventListener('click', () => updateRate(+10));
     ratePlusButton100.addEventListener('click', () => updateRate(+100));
     ratePlusButton1000.addEventListener('click', () => updateRate(+1000));
-
     rateResetButton.addEventListener('click', resetRate); // Call resetRate function
 
 });

@@ -10,10 +10,11 @@ import rq_dashboard
 from config import Config
 from models import db, init_db
 
+
 # Blueprints (Views)
 from views import gamestate_bp, gametime_bp, general_bp, space_bp, assets_bp, gamelog_bp
 
-
+import logging
 
 # Load environment variables
 load_dotenv()
@@ -48,17 +49,19 @@ def create_app(config_class=Config):
     app.config['RQ_QUEUE'] = q # Store it like this
     app.config['RQ_CONNECTION'] = redis_conn # Store it like this
 
-
-
+ 
     app.register_blueprint(gamestate_bp) 
     app.register_blueprint(gametime_bp)
     app.register_blueprint(gamelog_bp)
     
-
     app.register_blueprint(general_bp)   
 
     app.register_blueprint(space_bp)
     app.register_blueprint(assets_bp) 
+
+
+
+
 
     return app
 
@@ -72,4 +75,6 @@ if __name__ == "__main__":
         for template_path in app.jinja_loader.searchpath:
             print("Search Path:", template_path)
     print(app.url_map)
+
     app.run(debug=True, port=5005)
+

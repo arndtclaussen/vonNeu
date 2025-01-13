@@ -15,14 +15,11 @@ export function formatTimeRate(rate) { //Place here
 }
 
 
-
 export function updateGameTime() {
     const gameTimeSpan = document.getElementById('game-time');
     const timeRateSpan = document.getElementById('time-rate');
 
     
-
-
     fetch('/gametime/get_time_info') // New Flask route to get time info
         .then(response => response.json())
         .then(data => {
@@ -42,5 +39,7 @@ export function updateGameTime() {
         });
 }
 
+/*
 updateGameTime();
 setInterval(updateGameTime, 3000);
+*/

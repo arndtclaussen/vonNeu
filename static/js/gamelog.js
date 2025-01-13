@@ -18,6 +18,7 @@ export function updateGameLog() {
         });
 }
 
-
+/*
 updateGameLog();
 setInterval(updateGameLog, 3000); 
+*/

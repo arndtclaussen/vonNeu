@@ -92,3 +92,18 @@ https://github.com/yuxiaoy1/microblog/blob/main/app/models.py
 ## Honcho
 Using a Procfile to start different tasks
 * To identify, if still running lsof -i :5005
+
+We are using to write into logs
+```
+web: /home/claussena/Claussen/Projects/vonNeu/env/bin/python /home/claussena/Claussen/Projects/vonNeu/app.py
+worker: rq worker --with-scheduler > worker.log 2>&1 
+```
+
+Ur just noice less.
+```
+web: /home/claussena/Claussen/Projects/vonNeu/env/bin/python /home/claussena/Claussen/Projects/vonNeu/app.py
+worker: rq worker --with-scheduler -q 
+```
+
+
+## Take care that there is only ONE jump running

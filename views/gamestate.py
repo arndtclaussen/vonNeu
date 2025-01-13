@@ -15,6 +15,7 @@ from rq.registry import (
 
 from controllers.game_log import add_log_entry # Import add_log_entry
 
+from models import db, GameState
 
 gamestate_bp = Blueprint('gamestate', __name__, url_prefix='/gamestate', template_folder='../templates/gamestate')
 
@@ -24,6 +25,16 @@ gamestate_bp = Blueprint('gamestate', __name__, url_prefix='/gamestate', templat
 @gamestate_bp.route('/start_game_cyclce', methods=['POST'])
 def start_game_cyclce():
      
+
+    gamestate = GameState.query.first()
+    if gamestate.is_running:
+        return jsonify({'error': 'Game is already running'}), 400  # Bad Request
+
+    gamestate.is_running = True
+    db.session.commit()
+
+
+
     try:
         q = current_app.config['RQ_QUEUE']  
         job = q.enqueue_in(timedelta(seconds=Config.REDIS_TIME_SCHEDULE), update_game_state) # No need to pass current_app yet
@@ -40,6 +51,10 @@ def start_game_cyclce():
         
 @gamestate_bp.route('/clear_redis', methods=['POST'])
 def clear_redis_route():
+    gamestate = GameState.query.first()
+    gamestate.is_running = False
+    db.session.commit()
+    
     try:
         redis_conn = current_app.config['RQ_CONNECTION']
         queues = rq.Queue.all(connection=redis_conn)

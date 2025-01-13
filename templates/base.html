@@ -10,9 +10,11 @@
 <body class="flex h-screen">
     <div class="activity-bar w-24 bg-gray-800 flex flex-col">
 
-        <a href="{{ url_for('assets.probes') }}" class="block py-2 px-4 text-gray-100 hover:bg-gray-700 {% if request.endpoint.startswith('assets.') %}bg-gray-900{% endif %}">Assets</a>  
-        <a href="{{ url_for('space.asteroids') }}" class="block py-2 px-4 text-gray-100 hover:bg-gray-700 {% if request.endpoint.startswith('space.') %}bg-gray-900{% endif %}">Space</a>  
- 
+        <a href="{{ url_for('assets.probes') }}"
+            class="block py-2 px-4 text-gray-100 hover:bg-gray-700 {% if request.endpoint.startswith('assets.') %}bg-gray-900{% endif %}">Assets</a>
+        <a href="{{ url_for('space.asteroids') }}"
+            class="block py-2 px-4 text-gray-100 hover:bg-gray-700 {% if request.endpoint.startswith('space.') %}bg-gray-900{% endif %}">Space</a>
+
         <div class="flex-grow"></div>
     </div>
 
@@ -33,8 +35,8 @@
 
                 <button id="stop-game-cyclce" class="px-2 py-1 bg-red-500 text-white rounded">Stop</button>
                 <button id="start-game-cyclce" class="px-2 py-1 bg-green-500 text-white rounded">Start</button>
-        
-                
+
+
                 <button id="rate-plus" class="px-2 py-1 bg-gray-400 text-white rounded">+1</button>
                 <button id="rate-plus+10" class="px-2 py-1 bg-gray-400 text-white rounded">+10</button>
                 <button id="rate-plus+100" class="px-2 py-1 bg-gray-400 text-white rounded">+100</button>
@@ -60,11 +62,6 @@
 
 
     <script>
-        // JavaScript can be added here if needed
-
-
-
-
 
         const startGameCyclceButton = document.getElementById('start-game-cyclce');
         const stopGameCyclceButton = document.getElementById('stop-game-cyclce');
@@ -89,10 +86,26 @@
         });
 
 
-
-
-
     </script>
+
+
+    <script type="module">
+        import { updateGameTime } from "{{ url_for('static', filename='js/gametime.js') }}";
+        import { updateGameLog } from "{{ url_for('static', filename='js/gamelog.js') }}";
+
+        function updateGameInfo() {
+            updateGameTime();
+            updateGameLog();
+        }
+
+
+        updateGameInfo(); // Initial call
+        setInterval(updateGameInfo, 1000);
+    </script>
+
+
+
+
 </body>
 
 </html>
