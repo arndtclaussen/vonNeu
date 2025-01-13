@@ -1,4 +1,6 @@
 
+import time
+
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.orm import sessionmaker
 from config import Config  # Import your config
@@ -20,6 +22,8 @@ q = Queue(connection=redis_conn) # Declare it outside
 
 
 def update_game_state():
+    """Updates game state and returns the processing time."""
+    start_time = time.monotonic()  # Use monotonic time for accurate duration
 
     """Updates game state, including time and asteroid positions."""
     # Database connection within the task:
@@ -33,21 +37,17 @@ def update_game_state():
         if gamestate:
             
             # Figure out time
-            time_elapsed = timedelta(seconds=gamestate.time_rate)  # Get the time step
-            #time_elapsed_seconds = time_elapsed.total_seconds() 
-            
+            time_elapsed = timedelta(seconds=gamestate.time_rate)  # Get the time step          
             gamestate.game_time += time_elapsed
-            session.commit() # Commit game time update first
-
+            
             # 2. Update Asteroid Positions
             asteroids = session.query(Asteroid).all()  # Use session, not db
             for asteroid in asteroids:
                 asteroid.x_coordinate += asteroid.delta_v_x * time_elapsed.total_seconds()
                 asteroid.y_coordinate += asteroid.delta_v_y * time_elapsed.total_seconds()
-                session.commit() # Commit game time update first
                 
-            #print(f"Game state updated at {gamestate.game_time}, rate: {gamestate.time_rate}")
-
+            session.commit() # Commit game time update first
+            
         else:
             print("Error: GameState not found")
 
@@ -59,5 +59,6 @@ def update_game_state():
         print(f"Database error: {e}")
     finally:
         session.close()
-
-    return "Hello World from RQ Worker"
+        end_time = time.monotonic()
+        duration = end_time - start_time
+        return f"Game state updated. Processing time: {duration:.4f} seconds" # Return the time

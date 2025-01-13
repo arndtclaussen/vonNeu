@@ -25,7 +25,7 @@ gamestate_bp = Blueprint('gamestate', __name__, url_prefix='/gamestate', templat
 @gamestate_bp.route('/start_game_cyclce', methods=['POST'])
 def start_game_cyclce():
      
-
+    #Check if game is already running
     gamestate = GameState.query.first()
     if gamestate.is_running:
         return jsonify({'error': 'Game is already running'}), 400  # Bad Request
@@ -33,8 +33,7 @@ def start_game_cyclce():
     gamestate.is_running = True
     db.session.commit()
 
-
-
+    #Only if running procced
     try:
         q = current_app.config['RQ_QUEUE']  
         job = q.enqueue_in(timedelta(seconds=Config.REDIS_TIME_SCHEDULE), update_game_state) # No need to pass current_app yet
