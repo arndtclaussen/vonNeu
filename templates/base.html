@@ -104,6 +104,35 @@
     </script>
 
 
+<script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script> <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const namespace = '/test'; // Match the namespace used in the emit
+  
+        const socket = io(namespace);  // Connect to the namespace
+  
+  
+        socket.on('connect', () => {
+            console.log(`Connected to namespace ${namespace}`);
+        });
+  
+        socket.on('game_update', (data) => {
+            console.log('Received game update:', data); // Log the received data
+            // Process the data.message here (e.g., display it in the UI)
+            alert(data.message); // Example: Displaying the message in an alert
+        });
+  
+  
+        socket.on('disconnect', () => {
+            console.log(`Disconnected from namespace ${namespace}`);
+        });
+  
+        socket.on('connect_error', (error) => {
+            console.log('Socket connection error', error)
+        });
+  
+  
+    });
+  </script>
 
 
 </body>

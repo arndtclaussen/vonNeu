@@ -13,7 +13,7 @@ from datetime import timedelta
 
 from models import db, GameState, Asteroid  # Import necessary models
 
-
+from flask_socketio import SocketIO
 
 redis_conn = Redis(host=Config.REDIS_HOST_4_SCHEDULE, port=Config.REDIS_PORT_4_SCHEDULE, decode_responses=True)
 q = Queue(connection=redis_conn) # Declare it outside
@@ -24,6 +24,9 @@ q = Queue(connection=redis_conn) # Declare it outside
 def update_game_state():
     """Updates game state and returns the processing time."""
     start_time = time.monotonic()  # Use monotonic time for accurate duration
+
+    # Create sio instance within worker using the provided connection
+    #sio = SocketIO(message_queue=redis_conn) 
 
     """Updates game state, including time and asteroid positions."""
     # Database connection within the task:
@@ -48,6 +51,10 @@ def update_game_state():
                 
             session.commit() # Commit game time update first
             
+            #print(f"About to emit Socket.IO event. Redis connection: {redis_conn}")
+            #sio.emit('game_update', {'message': 'Hello, world!'}, namespace='/test')
+            #print("Socket.IO event emitted.")
+
         else:
             print("Error: GameState not found")
 

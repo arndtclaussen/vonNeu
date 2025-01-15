@@ -18,12 +18,12 @@ import logging
 
 # Load environment variables
 load_dotenv()
-
+from flask_socketio import SocketIO
 
 # Create a global Redis connection and RQ queue
 redis_conn = redis.Redis(host=os.getenv('REDIS_HOST'), port=os.getenv('REDIS_PORT'), decode_responses=True)
 q = Queue(connection=redis_conn)  # Use default queue or specify a name like 'low', 'medium', 'high'
-
+socketio = SocketIO()
 
 def create_app(config_class=Config):
     """
@@ -45,6 +45,8 @@ def create_app(config_class=Config):
         from models import init_db  # Import inside app context
         init_db(app)
 
+    socketio.init_app(app)
+ 
     # Make 'q' (RQ queue) accessible to blueprints
     app.config['RQ_QUEUE'] = q # Store it like this
     app.config['RQ_CONNECTION'] = redis_conn # Store it like this
@@ -76,5 +78,5 @@ if __name__ == "__main__":
             print("Search Path:", template_path)
     print(app.url_map)
 
-    app.run(debug=True, port=5005)
-
+    #app.run(debug=True, port=5005)
+    socketio.run(app)
