@@ -1,4 +1,4 @@
-
+import os
 import time
 
 from sqlalchemy import create_engine, inspect
@@ -25,8 +25,7 @@ def update_game_state():
     """Updates game state and returns the processing time."""
     start_time = time.monotonic()  # Use monotonic time for accurate duration
 
-    # Create sio instance within worker using the provided connection
-    #sio = SocketIO(message_queue=redis_conn) 
+    sio = SocketIO(message_queue=os.getenv('REDIS_URL'))  # Recreate socketio
 
     """Updates game state, including time and asteroid positions."""
     # Database connection within the task:
@@ -51,9 +50,9 @@ def update_game_state():
                 
             session.commit() # Commit game time update first
             
-            #print(f"About to emit Socket.IO event. Redis connection: {redis_conn}")
-            #sio.emit('game_update', {'message': 'Hello, world!'}, namespace='/test')
-            #print("Socket.IO event emitted.")
+            print(f"Emitting: { {'game_time': gamestate.game_time.strftime('%Y-%m-%d %H:%M:%S UTC')} }")  # Debug print
+            sio.emit('game_update', {'game_time': gamestate.game_time.strftime('%Y-%m-%d %H:%M:%S UTC')})
+
 
         else:
             print("Error: GameState not found")

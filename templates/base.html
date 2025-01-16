@@ -30,6 +30,8 @@
             <div>
                 <span id="game-time">Game Time: Loading...</span> |
                 <span id="time-rate">Rate: {{(gamestate.time_rate if gamestate else 1.0)}} </span>
+                <span id="game-time-io">Game Time: (Socket.IO)</span>
+
             </div>
             <div>
 
@@ -52,6 +54,35 @@
         </div>
     </main>
 
+
+    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const socket = io(); // Connect to the default namespace '/'  <- This is the key change
+    
+            socket.on('connect', () => {
+                console.log('Connected'); // Simplified log
+            });
+    
+            socket.on('game_update', (data) => {
+                console.log('Received game update:', data);
+                const gameTimeIOSpan = document.getElementById('game-time-io');
+                if (gameTimeIOSpan) {
+                    gameTimeIOSpan.textContent = "Game Time: " + data.game_time;
+                } else {
+                    console.error("Element 'game-time-io' not found!");
+                }
+            });
+    
+            socket.on('disconnect', () => {
+                console.log('Disconnected'); // Simplified log
+            });
+    
+            socket.on('connect_error', (error) => {
+                console.log('Socket connection error', error);
+            });
+        });
+    </script>
 
 
     <script type="module" src="{{ url_for('static', filename='js/gametime.js') }}"></script>
@@ -100,39 +131,9 @@
 
 
         updateGameInfo(); // Initial call
-        setInterval(updateGameInfo, 1000);
+        setInterval(updateGameInfo, 10000);
     </script>
 
-
-<script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script> <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const namespace = '/test'; // Match the namespace used in the emit
-  
-        const socket = io(namespace);  // Connect to the namespace
-  
-  
-        socket.on('connect', () => {
-            console.log(`Connected to namespace ${namespace}`);
-        });
-  
-        socket.on('game_update', (data) => {
-            console.log('Received game update:', data); // Log the received data
-            // Process the data.message here (e.g., display it in the UI)
-            alert(data.message); // Example: Displaying the message in an alert
-        });
-  
-  
-        socket.on('disconnect', () => {
-            console.log(`Disconnected from namespace ${namespace}`);
-        });
-  
-        socket.on('connect_error', (error) => {
-            console.log('Socket connection error', error)
-        });
-  
-  
-    });
-  </script>
 
 
 </body>

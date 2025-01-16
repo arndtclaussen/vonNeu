@@ -23,7 +23,7 @@ from flask_socketio import SocketIO
 # Create a global Redis connection and RQ queue
 redis_conn = redis.Redis(host=os.getenv('REDIS_HOST'), port=os.getenv('REDIS_PORT'), decode_responses=True)
 q = Queue(connection=redis_conn)  # Use default queue or specify a name like 'low', 'medium', 'high'
-socketio = SocketIO()
+
 
 def create_app(config_class=Config):
     """
@@ -45,8 +45,8 @@ def create_app(config_class=Config):
         from models import init_db  # Import inside app context
         init_db(app)
 
-    socketio.init_app(app)
- 
+        
+
     # Make 'q' (RQ queue) accessible to blueprints
     app.config['RQ_QUEUE'] = q # Store it like this
     app.config['RQ_CONNECTION'] = redis_conn # Store it like this
@@ -62,21 +62,19 @@ def create_app(config_class=Config):
     app.register_blueprint(assets_bp) 
 
 
+    socketio = SocketIO(app, message_queue=os.getenv('REDIS_URL'), cors_allowed_origins="*")
+    app.socketio = socketio # Correctly assigning app.socketio
+    return app # Correctly returning only the Flask app
 
 
 
-    return app
-
-
-if __name__ == "__main__":
-    app = create_app()
-
-    # Show Jinja loader info only in development environment
-    if os.environ.get('FLASK_ENV') == 'development':  # Access config this way
-        print("Jinja2 Loader:", app.jinja_loader)
+if __name__ == '__main__':
+    app = create_app()  # Fix: Call create_app() to get the app
+    
+    if os.environ.get('FLASK_ENV') == 'development':
+        print("Jinja2 Loader:", app.jinja_loader)  # Accessing app attributes works here
         for template_path in app.jinja_loader.searchpath:
             print("Search Path:", template_path)
-    print(app.url_map)
+        print(app.url_map)  # Now this works as app is a Flask object
 
-    #app.run(debug=True, port=5005)
-    socketio.run(app)
+    app.socketio.run(app)

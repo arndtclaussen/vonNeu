@@ -37,7 +37,7 @@ def start_game_cyclce():
     try:
         q = current_app.config['RQ_QUEUE']  
 
-        #redis_conn = current_app.config.get('RQ_REDIS_CONN')        
+        #redis_conn = current_app.config.get('RQ_REDIS_CONN')      
         job = q.enqueue_in(timedelta(seconds=Config.REDIS_TIME_SCHEDULE), update_game_state) # No need to pass current_app yet
         add_log_entry(f"In Game Started") # Add log entry
 
