@@ -5,8 +5,8 @@ from controllers.gamerate import get_rate, update_rate, reset_rate
 
 gamerate_bp = Blueprint('gamerate', __name__, url_prefix='/gamerate')
 
-@gamerate_bp.route('/get_time_info')
-def get_time_info():
+@gamerate_bp.route('/get_rate')
+def get_rate_route():
     return get_rate()
 
 

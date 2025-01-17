@@ -12,4 +12,5 @@ class Config:
     REDIS_PORT_4_SCHEDULE = "6379"
     REDIS_TIME_SCHEDULE = 1
 
+    GAME_LAST_N_LOGS = 10
     

@@ -18,7 +18,7 @@ export function updateTimeRate() {
     
     const timeRateSpan = document.getElementById('time-rate');
 
-    fetch('/gamerate/get_time_info')
+    fetch('/gamerate/get_rate')
         .then(response => response.json())
         .then(data => {
             if (data.time_rate) {

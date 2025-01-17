@@ -28,8 +28,9 @@
         </div>
         <div class="time-control mt-4 p-2 bg-white border border-gray-300 rounded flex justify-between items-center">
             <div>
-                <span id="game-time-io">Game Time: (Socket.IO)</span> | 
-                <span id="time-rate">Rate: {{(gamestate.time_rate if gamestate else 1.0)}} </span>
+                <span id="game-time-io">Game Time: {{ gamestate.game_time.strftime('%Y-%m-%d %H:%M:%S UTC') if gamestate
+                    else 'N/A' }}</span> |
+                <span id="time-rate">Rate: {{(gamestate.time_rate|round if gamestate else 1)}}x faster </span>
 
 
             </div>
@@ -49,7 +50,11 @@
         </div>
         <div class="game-log mt-4 p-2 bg-white border border-gray-300 rounded overflow-y-auto" style="flex-basis: 25%;">
             <div id="game-log-content">
-                <ul id="game-log-list"></ul>
+                <ul id="game-log-list">
+                    {% for log in logs %}
+                    <li>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S UTC') }} - {{ log.message }}</li>
+                    {% endfor %}
+                </ul>
             </div>
         </div>
     </main>
@@ -59,11 +64,13 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const socket = io(); // Connect to the default namespace '/'  <- This is the key change
-    
+
+            const gameLogList = document.getElementById('game-log-list');
+
             socket.on('connect', () => {
                 console.log('Connected'); // Simplified log
             });
-    
+
             socket.on('game_update', (data) => {
                 console.log('Received game update:', data);
                 const gameTimeIOSpan = document.getElementById('game-time-io');
@@ -73,20 +80,48 @@
                     console.error("Element 'game-time-io' not found!");
                 }
             });
-    
+
             socket.on('disconnect', () => {
                 console.log('Disconnected'); // Simplified log
             });
-    
+
             socket.on('connect_error', (error) => {
                 console.log('Socket connection error', error);
             });
+
+            socket.on('game_log_update', (data) => {
+                const newLogItem = document.createElement('li');
+
+                const timestamp = new Date(data.timestamp);
+
+                const formattedTimestamp = timestamp.toISOString()
+                    .replace('T', ' ')
+                    .replace('Z', ' UTC')
+                    .replace(/\.\d+/, '');
+
+
+                newLogItem.textContent = `${formattedTimestamp} - ${data.message}`;
+
+                // Insert at the top (beginning) of the list:
+                gameLogList.insertBefore(newLogItem, gameLogList.firstChild);
+
+                    // Limit the list to the last 10 items:
+                while (gameLogList.children.length > 10) {
+                    gameLogList.removeChild(gameLogList.lastChild);
+                }
+
+
+                // Scroll to the bottom if desired (for seeing newest entries if the list is long):
+                gameLogList.scrollTop = gameLogList.scrollHeight;  // If you want to keep the bottom visible
+                // Or scroll to the top to show the newest entry:
+                // gameLogList.scrollTop = 0; 
+            });
+
         });
     </script>
 
 
     <script type="module" src="{{ url_for('static', filename='js/gamerate.js') }}"></script>
-    <script type="module" src="{{ url_for('static', filename='js/gamelog.js') }}"></script>
 
 
     <script>
@@ -114,21 +149,6 @@
         });
 
 
-    </script>
-
-
-    <script type="module">
-        
-        import { updateGameLog } from "{{ url_for('static', filename='js/gamelog.js') }}";
-
-        function updateGameInfo() {
-            //updateTimeRate();
-            updateGameLog();
-        }
-
-
-        updateGameInfo(); // Initial call
-        setInterval(updateGameInfo, 10000);
     </script>
 
 
