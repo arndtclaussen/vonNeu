@@ -16,7 +16,7 @@ export function formatTimeRate(rate) { //Place here
 
 
 export function updateGameTime() {
-    const gameTimeSpan = document.getElementById('game-time');
+    
     const timeRateSpan = document.getElementById('time-rate');
 
     
@@ -24,22 +24,18 @@ export function updateGameTime() {
         .then(response => response.json())
         .then(data => {
             if (data.game_time && data.time_rate) {
-                gameTimeSpan.textContent = "Game Time: " + data.game_time;
+                
                 timeRateSpan.textContent = "Rate: " + formatTimeRate(data.time_rate);
             } else {
                 console.error("Invalid data received from server:", data);
-                gameTimeSpan.textContent = "Game Time: Error"; // Indicate an error
+    
                 timeRateSpan.textContent = "Rate: Error";       // Indicate an error
             }
         })
         .catch(error => {
             console.error('Error fetching game time:', error);
-            gameTimeSpan.textContent = "Game Time: Error"; // Display error message
+           
             timeRateSpan.textContent = "Rate: Error";       // Display error message
         });
 }
 
-/*
-updateGameTime();
-setInterval(updateGameTime, 3000);
-*/

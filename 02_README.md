@@ -109,4 +109,11 @@ worker: rq worker --with-scheduler -q
 ## Take care that there is only ONE jump running
 
 
+
+## Really good references
 https://github.com/redis-developer/basic-redis-chat-app-demo-python?tab=readme-ov-file
+
+
+## Todos
+* CleanUp Config and ENV
+    * 

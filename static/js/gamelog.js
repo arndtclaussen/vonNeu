@@ -17,8 +17,3 @@ export function updateGameLog() {
             console.error('Error fetching game logs:', error);
         });
 }
-
-/*
-updateGameLog();
-setInterval(updateGameLog, 3000); 
-*/
