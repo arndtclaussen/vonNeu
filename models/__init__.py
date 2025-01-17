@@ -51,7 +51,7 @@ def init_db(app):
                 {"name": "Asteroid Beta", "composition": "Silicate", "size": 55, "discovered_at": now - timedelta(days=15)},
                 {"name": "Asteroid Gamma", "composition": "Carbon-rich", "size": 1500, "discovered_at": now - timedelta(days=365*2)},
                 {"name": "Asteroid Delta", "composition": "Nickel-Iron", "size": 100, "discovered_at": now - timedelta(days=10)},
-                {"name": "Asteroid Epsilon", "composition": "Stony", "size": 75, "discovered_at": None}, # Unknown discovery date
+                {"name": "Asteroid Epsilon", "composition": "Stony", "size": 75, "discovered_at": now - timedelta(days=10)}, # Unknown discovery date
             ]
             for data in asteroids_data:
                 # Generate random coordinates and delta-v values

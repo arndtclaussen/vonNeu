@@ -43,15 +43,31 @@ def update_game_state():
             gamestate.game_time += time_elapsed
             
             # 2. Update Asteroid Positions
-            asteroids = session.query(Asteroid).all()  # Use session, not db
+            asteroids =  session.query(Asteroid).order_by(Asteroid.id.desc()).all()   # Use session, not db
             for asteroid in asteroids:
                 asteroid.x_coordinate += asteroid.delta_v_x * time_elapsed.total_seconds()
                 asteroid.y_coordinate += asteroid.delta_v_y * time_elapsed.total_seconds()
                 
             session.commit() # Commit game time update first
             
-            print(f"Emitting: { {'game_time': gamestate.game_time.strftime('%Y-%m-%d %H:%M:%S UTC')} }")  # Debug print
+
+            # 3. Emitting stuff
             sio.emit('game_update', {'game_time': gamestate.game_time.strftime('%Y-%m-%d %H:%M:%S UTC')})
+
+            asteroids_data = [{'name': a.name, 
+                               'composition': a.composition, 
+                               'size': a.size,
+                               'discovered_at': a.discovered_at.isoformat().replace('T', ' ') if a.discovered_at else None,  # Convert datetime to string
+                               'x_coordinate': a.x_coordinate,
+                               'y_coordinate': a.y_coordinate, 
+                               'delta_v_x': a.delta_v_x, 
+                               'delta_v_y':a.delta_v_y
+                               }
+                          for a in asteroids]
+            
+            sio.emit('asteroid_update', asteroids_data)
+            sio.emit('game_time_update', {'game_time': gamestate.game_time.strftime('%Y-%m-%d %H:%M:%S UTC')})
+
 
 
         else:

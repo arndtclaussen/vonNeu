@@ -14,7 +14,8 @@ space_bp = Blueprint('space', __name__, url_prefix='/space', template_folder='..
 def asteroids():
     gamestate = GameState.query.first()
     logs = get_last_n_logs()
-    return render_template('space/asteroids.html', gamestate=gamestate, logs=logs)
+    asteroids = Asteroid.query.order_by(Asteroid.id.desc()).all() 
+    return render_template('space/asteroids.html', gamestate=gamestate, logs=logs,initial_asteroids=asteroids)
 
 @space_bp.route('/get_asteroids')
 def get_asteroids():

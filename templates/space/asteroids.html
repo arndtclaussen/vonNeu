@@ -24,18 +24,32 @@
                 <th class="px-4 py-2 border-b border-gray-300">Y-delta_v_y</th>
             </tr>
         </thead>
-        <tbody id="asteroids-table-body" class="text-gray-700">
-            <!-- Asteroid data will be inserted here -->
+        <tbody id="asteroids-table-body">
+            {% for asteroid in initial_asteroids %}
+            <tr class="{% if loop.index % 2 == 1 %}bg-white{% else %}bg-gray-50{% endif %} hover:bg-gray-100 border-b">  <!-- Jinja2 conditional for striping -->
+                <td class="px-4 py-2">{{ asteroid.name }}</td>
+                <td class="px-4 py-2">{{ asteroid.composition }}</td>
+                <td class="px-4 py-2 text-right">{{ asteroid.size }}</td>
+                <td class="px-4 py-2">{{ asteroid.discovered_at|default("N/A") }}</td>
+                <td class="px-4 py-2 text-right">{{ "%.2f"|format(asteroid.x_coordinate) }}</td>
+                <td class="px-4 py-2 text-right">{{ "%.2f"|format(asteroid.y_coordinate) }}</td>
+                <td class="px-4 py-2 text-right">{{ "%.2f"|format(asteroid.delta_v_x) }}</td>
+                <td class="px-4 py-2 text-right">{{ "%.2f"|format(asteroid.delta_v_y) }}</td>
+
+            </tr>
+            {% endfor %}
         </tbody>
     </table>
 </div>
 
 
+
+<script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script> 
 <script>
-    function updateAsteroidTable() {
-        fetch('/space/get_asteroids')
-            .then(response => response.json())
-            .then(asteroids => {
+    const socket = io();  // Connect to the Socket.IO server
+
+    socket.on('asteroid_update', (asteroids) => {
+
                 const tableBody = document.getElementById('asteroids-table-body');
                 tableBody.innerHTML = ''; // Clear existing rows
 
@@ -90,9 +104,7 @@
                 });
             })
             .catch(error => console.error('Error fetching asteroids:', error));
-    }
+    
 
-    updateAsteroidTable();
-    setInterval(updateAsteroidTable, 10000); 
 </script>
 {% endblock %}
