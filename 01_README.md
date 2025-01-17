@@ -117,3 +117,5 @@ https://github.com/redis-developer/basic-redis-chat-app-demo-python?tab=readme-o
 ## Todos
 * CleanUp Config and ENV
     * 
+* Make GameLog better:
+    * More, select, search,....

@@ -18,7 +18,7 @@ export function updateTimeRate() {
     
     const timeRateSpan = document.getElementById('time-rate');
 
-    fetch('/gametime/get_time_info')
+    fetch('/gamerate/get_time_info')
         .then(response => response.json())
         .then(data => {
             if (data.time_rate) {
@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     function updateRate(change) {
-        fetch('/gametime/update_rate', {
+        fetch('/gamerate/update_rate', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function resetRate() {
-        fetch('/gametime/reset_rate', { method: 'POST' }) // Send POST to new route
+        fetch('/gamerate/reset_rate', { method: 'POST' }) // Send POST to new route
             .then(response => {
                 if (response.ok) {
                     console.log('rate has been reset')

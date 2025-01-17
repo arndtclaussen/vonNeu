@@ -12,7 +12,7 @@ from models import db, init_db
 
 
 # Blueprints (Views)
-from views import gamestate_bp, gametime_bp, general_bp, space_bp, assets_bp, gamelog_bp
+from views import gamestate_bp, gamerate_bp, general_bp, space_bp, assets_bp, gamelog_bp
 
 import logging
 
@@ -53,7 +53,7 @@ def create_app(config_class=Config):
 
  
     app.register_blueprint(gamestate_bp) 
-    app.register_blueprint(gametime_bp)
+    app.register_blueprint(gamerate_bp)
     app.register_blueprint(gamelog_bp)
     
     app.register_blueprint(general_bp)   
