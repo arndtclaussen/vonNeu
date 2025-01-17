@@ -19,22 +19,19 @@ export function updateGameTime() {
     
     const timeRateSpan = document.getElementById('time-rate');
 
-    
     fetch('/gametime/get_time_info') // New Flask route to get time info
         .then(response => response.json())
         .then(data => {
-            if (data.game_time && data.time_rate) {
+            if (data.time_rate) {
                 
                 timeRateSpan.textContent = "Rate: " + formatTimeRate(data.time_rate);
             } else {
                 console.error("Invalid data received from server:", data);
-    
                 timeRateSpan.textContent = "Rate: Error";       // Indicate an error
             }
         })
         .catch(error => {
             console.error('Error fetching game time:', error);
-           
             timeRateSpan.textContent = "Rate: Error";       // Display error message
         });
 }

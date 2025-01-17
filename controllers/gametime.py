@@ -25,7 +25,6 @@ def update_rate():
         return jsonify({'error': str(e)}), 500
 
 def reset_rate():
- 
     try:
         gamestate = GameState.query.first()
         if gamestate:
@@ -38,3 +37,15 @@ def reset_rate():
         db.session.rollback()
         print("Error resetting rate:", e)
         return jsonify({'error': str(e)}), 500
+    
+def get_rate():
+    try:
+        gamestate = GameState.query.first()
+        if gamestate:
+            return jsonify({'time_rate': gamestate.time_rate}), 200
+        else:
+            return jsonify({'error': 'Game state not found'}), 404
+
+    except Exception as e:  # Catch potential database errors
+        print(f"Error getting rate: {e}")  # Log the error for debugging
+        return jsonify({'error': 'Database error'}), 500 #  Generic error message for security. More specific logging should be done elsewhere.
