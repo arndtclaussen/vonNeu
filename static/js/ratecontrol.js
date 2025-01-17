@@ -18,7 +18,7 @@ export function updateTimeRate() {
     
     const timeRateSpan = document.getElementById('time-rate');
 
-    fetch('/gametime/get_time_info') // New Flask route to get time info
+    fetch('/gametime/get_time_info')
         .then(response => response.json())
         .then(data => {
             if (data.time_rate) {

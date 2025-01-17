@@ -1,5 +1,15 @@
 from models import db, GameLog, GameState
 
+
+def get_last_10_logs():
+    try:
+        logs = GameLog.query.order_by(GameLog.timestamp.desc()).limit(10).all()
+        return logs
+    except Exception as e:
+        print(f"Error retrieving logs: {e}")
+        return [] # Return an empty list on error
+    
+
 def add_log_entry(message):
     try:
         gamestate = GameState.query.first()
@@ -12,11 +22,3 @@ def add_log_entry(message):
     except Exception as e:
         db.session.rollback()
         print(f"Error adding log entry: {e}")
-
-def get_last_10_logs():
-    try:
-        logs = GameLog.query.order_by(GameLog.timestamp.desc()).limit(10).all()
-        return logs
-    except Exception as e:
-        print(f"Error retrieving logs: {e}")
-        return [] # Return an empty list on error
