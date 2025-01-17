@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify # Import current_app
 from models import GameState
 
-from controllers.game_log import get_last_10_logs, add_log_entry # Import add_log_entry
+from controllers.gamelog import get_last_10_logs, add_log_entry # Import add_log_entry
 
 
 

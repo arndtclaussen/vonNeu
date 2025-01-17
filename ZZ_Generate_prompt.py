@@ -68,9 +68,7 @@ if __name__ == "__main__":
         os.path.join(".", "utils/__pycache__"),
         os.path.join(".", "tasks/__pycache__"),
         os.path.join(".", "controllers/__pycache__"),
-        os.path.join(".", "ZZ_redis_db_connection.py"),
-        os.path.join(".", "ZZ_redis_module.py"),
-        os.path.join(".", "ZZ_redis_training.py"),        
+
 
                 
     ]

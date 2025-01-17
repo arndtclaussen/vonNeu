@@ -13,7 +13,7 @@ from rq.registry import (
     ScheduledJobRegistry,
 )
 
-from controllers.game_log import add_log_entry # Import add_log_entry
+from controllers.gamelog import add_log_entry # Import add_log_entry
 
 from models import db, GameState
 

@@ -1,7 +1,7 @@
 # controllers/gametime.py
 from flask import jsonify, request
 from models import GameState, db
-from controllers.game_log import add_log_entry 
+from controllers.gamelog import add_log_entry 
 
 
 def update_rate():

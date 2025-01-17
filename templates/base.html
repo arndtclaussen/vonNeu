@@ -121,11 +121,11 @@
 
 
     <script type="module">
-        import { updateGameTime } from "{{ url_for('static', filename='js/gametime.js') }}";
+        
         import { updateGameLog } from "{{ url_for('static', filename='js/gamelog.js') }}";
 
         function updateGameInfo() {
-            updateGameTime();
+            //updateTimeRate();
             updateGameLog();
         }
 
