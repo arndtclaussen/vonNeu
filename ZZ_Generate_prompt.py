@@ -10,6 +10,7 @@ def list_files_recursive(directory, output_file, ignore_list):
     with open(output_file, "w", encoding="utf-8") as f:  # Add encoding for potential special characters
         f.write("0) Briefing:\n") # Initial PROPMT
         f.write("Please behave like a Python / FLask / Reddis / PostgresSQL Expert coming from the gaming development industry:\n") # Initial PROPMT
+        f.write("We accept the setup that the Reddis worker has to reconnec to DB and Websocket. This is the only reliable way.:\n") # Initial PROPMT
         f.write("Please analyze the complete code and summarize it in a few sentences. Then i will ask you specific questions. \n") # Initial PROPMT
 
 

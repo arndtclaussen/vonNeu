@@ -1,7 +1,7 @@
 import os
 import time
 
-from sqlalchemy import create_engine, inspect
+from sqlalchemy import create_engine 
 from sqlalchemy.orm import sessionmaker
 from config import Config  # Import your config
 
@@ -11,7 +11,7 @@ from redis import Redis
 from datetime import timedelta
 
 
-from models import db, GameState, Asteroid  # Import necessary models
+from models import GameState, Asteroid  # Import necessary models
 
 from flask_socketio import SocketIO
 
@@ -24,7 +24,6 @@ q = Queue(connection=redis_conn) # Declare it outside
 def update_game_state():
     """Updates game state and returns the processing time."""
     start_time = time.monotonic()  # Use monotonic time for accurate duration
-
     sio = SocketIO(message_queue=os.getenv('REDIS_URL'))  # Recreate socketio
 
     """Updates game state, including time and asteroid positions."""

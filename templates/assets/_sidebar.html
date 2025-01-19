@@ -1,4 +1,5 @@
 <ul>
+    <li><a href="{{ url_for('assets.heaven') }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300 {% if request.endpoint.startswith('assets.heaven') %}bg-gray-400{% endif %}">Heaven</a></li>
     <li><a href="{{ url_for('assets.probes') }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300 {% if request.endpoint.startswith('assets.probes') %}bg-gray-400{% endif %}">Probes</a></li>
     <li><a href="{{ url_for('assets.miners') }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300 {% if request.endpoint.startswith('assets.miners') %}bg-gray-400{% endif %}">Miners</a></li>
     <li><a href="{{ url_for('assets.tugs') }}" class="block py-2 px-4 text-gray-800 hover:bg-gray-300 {% if request.endpoint.startswith('assets.tugs') %}bg-gray-400{% endif %}">Tugs</a></li>

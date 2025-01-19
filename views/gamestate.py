@@ -1,10 +1,10 @@
 import rq  # Make sure to import rq
-from flask import Blueprint, jsonify, current_app # Import current_app
+from flask import Blueprint, jsonify, current_app #
 
 from datetime import timedelta
 
 from tasks.gamestate import update_game_state
-from config import Config  # Import your config
+from config import Config 
 
 
 from rq.registry import (
